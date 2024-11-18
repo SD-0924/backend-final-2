@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+   
+    "target": "ES2020",                                  
+    "module": "commonjs",                                
+    "rootDir": "./src",                                  
+    "resolveJsonModule": true,                        
+     "outDir": "./dist",                                   
+    "esModuleInterop": true,                             
+    "forceConsistentCasingInFileNames": true,           
+    "strict": true,
+    "skipLibCheck": true                                 
+  },
+  //this ensures all typescript files are compiled no matter where they are located
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}
