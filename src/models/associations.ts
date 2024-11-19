@@ -1,4 +1,3 @@
-import { Admin } from "./AdminModel";
 import { User } from "./UserModel";
 import { Wishlist } from "./WishListModel";
 import { Cart } from "./CartModel";
@@ -18,7 +17,6 @@ import colors from "colors";
  * Sets up associations between models
  **/
 export const setupAssociations = () => {
-  Admin.sync({ force: true });
   /**
    * Many-to-many relationship between products and categories.
    * Each product can have many categories, and each category can have many products.
