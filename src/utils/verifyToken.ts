@@ -31,8 +31,8 @@ export const verifyToken = async (
     const decodedToken = jwt.verify(
       token,
       process.env.JWT_SECRET || ''
-    ) as JwtPayload;
-    (req as CustomRequest).token = decodedToken
+    ) as JwtPayload
+    ;(req as CustomRequest).token = decodedToken
 
     next()
   } catch (err) {

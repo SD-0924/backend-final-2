@@ -87,8 +87,7 @@ export const login = async (
   res: Response,
   next: NextFunction
 ) => {
-
-  const{value,error} = validateLoginUser(req.body);
+  const { value, error } = validateLoginUser(req.body)
 
   if (error) {
     res.status(400).send(error + '')
@@ -102,7 +101,7 @@ export const login = async (
   } else {
     const payload = {
       id: user.dataValues.id,
-      role:value.role,
+      role: value.role,
     }
 
     //check if the password is correct
@@ -110,7 +109,7 @@ export const login = async (
       const token = generateToken(payload)
       res.status(200).json({ token })
     } else {
-      throw new Error('your email or password is wrong');
+      throw new Error('your email or password is wrong')
     }
   }
 }
