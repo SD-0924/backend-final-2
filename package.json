@@ -5,7 +5,7 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/server.ts",
-    "dev": "nodemon --watch 'src/**/*.ts' --exec ts-node server.ts",
+    "dev": "nodemon --watch 'src/**/*.ts' --exec ts-node src/server.ts",
     "test": "jest",
     "seed": "npx sequelize-cli db:seed:all"
   },
@@ -14,14 +14,17 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@types/jsonwebtoken": "^9.0.7",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.21.1",
+    "install": "^0.13.0",
     "joi": "^17.13.3",
     "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.11.4",
+    "npm": "^10.9.0",
     "sequelize": "^6.37.5"
   },
   "devDependencies": {
