@@ -1,11 +1,7 @@
-// Import sequelize refrence
 import { sequelize } from "../config/db";
-
-// Import DataTypes from sequelize module
 import { DataTypes } from "sequelize";
-
-// Import User model
 import { User } from "./UserModel";
+import { Product } from "./ProductModel";
 
 // Define the Cart model
 export const Cart = sequelize.define(
@@ -23,14 +19,20 @@ export const Cart = sequelize.define(
         key: "user_id",
       },
     },
-    createdAt: {
-      type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW,
+    product_id: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: Product,
+        key: "product_id",
+      },
+    },
+    quantity: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
     },
   },
   {
     tableName: "cart",
-    timestamps: true,
-    updatedAt: false,
+    timestamps: false,
   }
 );

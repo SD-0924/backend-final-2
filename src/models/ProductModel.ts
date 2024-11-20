@@ -1,8 +1,6 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../config/db";
-
 import { Merchant } from "./MerchantModel";
-import { Category } from "./CategoryModel";
 
 // Create a PRODUCTS Schema
 export const Product = sequelize.define(
@@ -46,14 +44,6 @@ export const Product = sequelize.define(
       references: {
         model: Merchant, // Reference to Merchants table
         key: "merchant_id",
-      },
-    },
-    category_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: Category, // Reference to category table
-        key: "category_id",
       },
     },
     brand_name: {

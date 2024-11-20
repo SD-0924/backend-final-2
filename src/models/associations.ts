@@ -2,8 +2,6 @@ import { User } from "./UserModel";
 import { Wishlist } from "./WishListModel";
 import { Cart } from "./CartModel";
 import { Rating } from "./RatingModel";
-import { WishlistProduct } from "./WishListProductModel";
-import { CartItem } from "./CartItemModel";
 import { Product } from "./ProductModel";
 import { Category } from "./CategoryModel";
 import { Merchant } from "./MerchantModel";
@@ -63,32 +61,6 @@ export const setupAssociations = () => {
   });
 
   /**
-   * One-to-one relationship between users and wishlists.
-   * Each user can have one wishlist, and each wishlist belongs to one user.
-   */
-  User.hasOne(Wishlist, {
-    foreignKey: "user_id",
-    onDelete: "CASCADE",
-  });
-
-  Wishlist.belongsTo(User, {
-    foreignKey: "user_id",
-  });
-
-  /**
-   * One-to-one relationship between users and carts.
-   * Each user can have one cart, and each cart belongs to one user.
-   */
-  User.hasOne(Cart, {
-    foreignKey: "user_id",
-    onDelete: "CASCADE",
-  });
-
-  Cart.belongsTo(User, {
-    foreignKey: "user_id",
-  });
-
-  /**
    * One-to-many relationship between users and ratings.
    * Each user can have many ratings, but a rating can only belong to one user.
    */
@@ -115,35 +87,35 @@ export const setupAssociations = () => {
   });
 
   /**
-   * Many-to-many relationship between carts and products.
-   * Each cart can have many products, and each product can be in many carts.
+   * Many-to-many relationship between user and products.
+   * Each user can add multiple products on cart, and each product can be added from different users on cart.
    */
-  Cart.belongsToMany(Product, {
-    through: CartItem,
-    foreignKey: "cart_id",
+  User.belongsToMany(Product, {
+    through: Cart,
+    foreignKey: "user_id",
     otherKey: "product_id",
   });
 
-  Product.belongsToMany(Cart, {
-    through: CartItem,
+  Product.belongsToMany(User, {
+    through: Cart,
     foreignKey: "product_id",
-    otherKey: "cart_id",
+    otherKey: "user_id",
   });
 
   /**
-   * Many-to-many relationship between wishlists and products.
-   * Each wishlist can have many products, and each product can be in many wishlists.
+   * Many-to-many relationship between user and products.
+   * Each user can add multiple products on wishlist, and each product can be added from different users on wishlist.
    */
-  Wishlist.belongsToMany(Product, {
-    through: WishlistProduct,
-    foreignKey: "wishlist_id",
+  User.belongsToMany(Product, {
+    through: Wishlist,
+    foreignKey: "user_id",
     otherKey: "product_id",
   });
 
-  Product.belongsToMany(Wishlist, {
-    through: WishlistProduct,
+  Product.belongsToMany(User, {
+    through: Wishlist,
     foreignKey: "product_id",
-    otherKey: "wishlist_id",
+    otherKey: "user_id",
   });
 
   //success message
