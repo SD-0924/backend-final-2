@@ -24,6 +24,7 @@ app.use(invalidRoute);
 // Middleware to handle invalid JSON structure
 app.use(invalidJSON);
 
+
 app.listen(PORT, async () => {
   console.log(`Server is running on port ${PORT}`);
 
@@ -41,4 +42,7 @@ app.listen(PORT, async () => {
   // console.log("Syncing Admin model...");
   // await Admin.sync({ force: true });
   // console.log("Admin model has been synced.");
-});
+
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+})}
