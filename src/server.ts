@@ -3,16 +3,19 @@ import dotenv from "dotenv";
 import { Admin } from "./models/AdminModel";
 import { sequelize, connectToDB } from "./config/db";
 import { setupAssociations } from "./models/associations";
-
+// import { signUp } from "./controllers/authController";
 dotenv.config();
 
+dotenv.configDotenv();
 const app = express();
 
 const PORT = Number(process.env.PORT);
-
+app.use(express.json());
 app.get("/", (req, res) => {
   res.send(`Hello World`);
 });
+
+// app.post("/api/signup", signUp);
 
 app.listen(PORT, async () => {
   console.log(`Server is running on port ${PORT}`);
@@ -31,4 +34,8 @@ app.listen(PORT, async () => {
   // console.log("Syncing Admin model...");
   // await Admin.sync({ force: true });
   // console.log("Admin model has been synced.");
+});
+
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });
