@@ -2,7 +2,12 @@ import { Request, Response, NextFunction } from "express";
 import UserService from "../services/userServices";
 import generateToken from "../utils/generateToken";
 import { configDotenv } from "dotenv";
-import Joi from "Joi";
+import {
+  validateUserSignUp,
+  validateMerchantSignUp,
+} from "../utils/validateUser";
+import MerchantService from "../services/merchantService";
+
 configDotenv();
 export const signUp = async (
   req: Request,
@@ -10,60 +15,62 @@ export const signUp = async (
   next: NextFunction
 ) => {
   try {
-    //validation logic
-    console.log("this is body,", req.body);
-    const schema = Joi.object({
-      firstName: Joi.string().alphanum().min(2).max(15).required(),
-      lastName: Joi.string().alphanum().min(2).max(15).required(),
-      address: Joi.string().min(20).max(100).required(),
-      email: Joi.string()
-        .email({
-          minDomainSegments: 2,
-          tlds: { allow: ["com", "net", "org", "io"] },
-        })
-        .required(),
-      role: Joi.string().valid("user", "merchant").required(),
-      phone: Joi.string()
-        .required()
-        .pattern(/^\+?[1-9]\d{1,14}$/),
+    let result: any; //mercahnt or user object
 
-      dateOfBirth: Joi.string().required(),
-      password: Joi.string()
-        .pattern(new RegExp("^[a-zA-Z0-9]{3,30}$"))
-        .min(6)
-        .max(30)
-        .required(),
-    });
-    console.log(req.body);
-    const { value, error } = schema.validate(req.body);
-    console.log(error);
-    console.log(value);
-    if (error) {
-      res.status(400).send(error + "");
-      return;
-      // throw error;rs
+    if (req.body.role === "user") {
+      //validation logic
+
+      const { value, error } = validateUserSignUp(req.body);
+
+      if (error) {
+        res.status(400).send(error + "");
+        return;
+      }
+
+      //make sure user does not exist
+      if (await UserService.findUserByEmail(value.email)) {
+        res.status(400).json({
+          success: false,
+          message: "User already exists, please login.",
+        });
+        return;
+      }
+      //create user
+      const user = await UserService.createUser(value);
+      if (!user) {
+        throw new Error("Internal server Error");
+      }
+      result = user;
     }
-    //check if email does not exist then email is in database
-    const userd = await UserService.findUserByEmail(value.email);
-    console.log("this is suserdddd", userd);
-    if (userd) {
-      res.status(400).json({
-        success: false,
-        message: "User already exists, please login.",
-      });
-      return;
-    }
-    const user = await UserService.createUser(value);
-    if (!user) {
-      throw new Error("Internal server Error");
+
+    if (req.body.role === "merchant") {
+      //validation logic
+
+      const { value, error } = validateMerchantSignUp(req.body);
+      if (error) {
+        res.status(400).send(error + "");
+        return;
+      }
+      //make sure merchant does not exist
+      if (await MerchantService.findMerchantByEmail(value.email)) {
+        res.status(400).json({
+          success: false,
+          message: "User already exists, please login.",
+        });
+        return;
+      }
+      const merchant = await MerchantService.createUser(value);
+      if (!merchant) {
+        throw new Error("Internal server Error");
+      }
+      result = merchant;
     }
     //generate token
-
-    const token = generateToken(
-      { id: req.body.id, role: req.body.role },
-      process.env.JWT_SECRET || ""
-    );
-
+    const token = generateToken({
+      id: result.user_id || result.merchant_id,
+      role: req.body.role,
+    });
+    //send back to the user
     res.status(201).json({
       success: true,
       token,

@@ -1,10 +1,17 @@
+import { User } from "../models/UserModel";
+
 export default class UserService {
   static async findUserByEmail(email: string) {
-    return null;
+    const user = await User.findOne({
+      where: {
+        email,
+      },
+    });
+    return user;
   }
 
   static async createUser(user: Omit<object, "role">) {
-    console.log(user);
-    return user;
+    const result = await User.create(user);
+    return result;
   }
 }
