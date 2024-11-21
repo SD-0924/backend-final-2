@@ -34,5 +34,11 @@ export const Rating = sequelize.define(
   {
     tableName: "rating",
     timestamps: false,
+    indexes: [
+      {
+        unique: true,
+        fields: ["user_id", "product_id"],
+      },
+    ],
   }
 );
