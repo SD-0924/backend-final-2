@@ -5,10 +5,11 @@ import { sequelize, connectToDB } from "./config/db";
 import { setupAssociations } from "./models/associations";
 import { productRoutes } from "./routes/productRoutes";
 import { invalidRoute, invalidJSON } from "./middleware/errorHandler";
+import { signUp } from "./controllers/authController";
 
 dotenv.config();
 
-const app = express();
+export const app = express();
 
 const PORT = Number(process.env.PORT);
 
