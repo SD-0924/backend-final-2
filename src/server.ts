@@ -3,16 +3,21 @@ import dotenv from "dotenv";
 import { Admin } from "./models/AdminModel";
 import { sequelize, connectToDB } from "./config/db";
 import { setupAssociations } from "./models/associations";
+import { productRoutes } from "./routes/productRoutes";
+import { invalidRoute, invalidJSON } from "./middleware/errorHandler";
 import { signUp } from "./controllers/authController";
 
-dotenv.configDotenv();
 export const app = express();
 
 const PORT = Number(process.env.PORT);
 
-app.get("/", (req, res) => {
-  res.send(`Hello World`);
-});
+app.use("/api", productRoutes);
+
+// Middleware to handle invalid routes
+app.use(invalidRoute);
+
+// Middleware to handle invalid JSON structure
+app.use(invalidJSON);
 
 // app.listen(PORT, async () => {
 //   console.log(`Server is running on port ${PORT}`);
