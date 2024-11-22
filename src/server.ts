@@ -4,14 +4,18 @@ import { Admin } from "./models/AdminModel";
 import { sequelize, connectToDB } from "./config/db";
 import { setupAssociations } from "./models/associations";
 import { productRoutes } from "./routes/productRoutes";
+import merchantRoutes from "./routes/merchantRoutes";
 import { invalidRoute, invalidJSON } from "./middleware/errorHandler";
 import { signUp } from "./controllers/authController";
 
-export const app = express();
 
-const PORT = Number(process.env.PORT);
+export const app = express();
+app.use(express.json());
+
+const PORT = Number(process.env.PORT) || 3000;
 
 app.use("/api", productRoutes);
+app.use("/api/", merchantRoutes);
 
 // Middleware to handle invalid routes
 app.use(invalidRoute);
@@ -38,6 +42,7 @@ app.use(invalidJSON);
 //   console.log("Admin model has been synced.");
 // });
 
-export const server = app.listen(PORT, () => {
+export const server = app.listen(PORT, async () => {
+  await connectToDB();
   console.log(`Server is running on port ${PORT}`);
 });
