@@ -4,7 +4,7 @@ import { Sequelize } from "sequelize";
 // Load environment variables
 import dotenv from "dotenv";
 
-dotenv.config();
+dotenv.config({ path: "../.env" });
 
 // Initialize Sequelize with MySQL database credentials
 export const sequelize = new Sequelize(

@@ -103,3 +103,28 @@ export class productService {
     return products;
   }
 }
+
+export const getProductByBrand = async (brand: string) => {
+  try{
+      const products = await Product.findAll({
+          where: {
+              brand_name: brand,
+          },
+      });
+      if (products.length === 0) {
+          return {status: 404, response: "No products found"};
+      }
+      return {status: 200, response: products};
+  } catch (error) {
+      return {status: 500, response: error};
+  }
+};
+
+export const createProduct = async (product: any) => {
+  try {
+      const newProduct = await Product.create(product);
+      return { status: 201, response: newProduct };
+  } catch (error) {
+      return { status: 500, response: error };
+  }
+};
