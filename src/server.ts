@@ -21,11 +21,15 @@ app.use('/api', productRoutes)
 app.use('/api/', merchantRoutes)
 app.use('/api', imageRouter)
 app.use('/api', authRouter)
+app.use('/api', productRoutes)
+app.use('/api/', merchantRoutes)
+app.get('/api/wishlist', wishlistRoutes)
 
 // Middleware to handle invalid routes
 app.use(invalidRoute)
 
 // Middleware to handle invalid JSON structure
+app.use(invalidJSON)
 app.use(invalidJSON)
 
 app.listen(PORT, async () => {

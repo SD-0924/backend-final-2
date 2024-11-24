@@ -6,6 +6,18 @@ export default class WishlistController {
   static async createWishlistItem(req: Request, res: Response) {
     const { userId, productId } = req.body;
 
+    // Input validation
+    if (
+      !userId ||
+      !productId ||
+      isNaN(parseInt(userId)) ||
+      isNaN(parseInt(productId))
+    ) {
+      return res.status(400).json({
+        message: "Invalid userId or productId. They must be valid numbers.",
+      });
+    }
+
     try {
       const newWishlistItem = await WishlistService.createWishlistItem(
         parseInt(userId),
@@ -21,6 +33,13 @@ export default class WishlistController {
   // Get all wishlist items for a user
   static async getAllWishlistItems(req: Request, res: Response) {
     const { userId } = req.params;
+
+    // Input validation
+    if (!userId || isNaN(parseInt(userId))) {
+      return res.status(400).json({
+        message: "Invalid userId. It must be a valid number.",
+      });
+    }
 
     try {
       const wishlistItems = await WishlistService.findAllWishlistItems(
@@ -39,13 +58,20 @@ export default class WishlistController {
   static async deleteWishlistItem(req: Request, res: Response) {
     const { wishlistId } = req.params;
 
+    // Input validation
+    if (!wishlistId || isNaN(parseInt(wishlistId))) {
+      return res.status(400).json({
+        message: "Invalid wishlistId. It must be a valid number.",
+      });
+    }
+
     try {
       const deleted = await WishlistService.destroyWishlistItem(
         parseInt(wishlistId)
       );
 
       if (!deleted) {
-        res.status(404).json({ message: "Wishlist item not found." });
+        return res.status(404).json({ message: "Wishlist item not found." });
       }
 
       res.status(200).json({ message: "Wishlist item deleted successfully." });
