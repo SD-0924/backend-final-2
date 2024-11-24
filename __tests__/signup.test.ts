@@ -1,156 +1,163 @@
 import { signUp } from "../src/controllers/authController";
-import supertest from "supertest";
-import express, { Request, Response, NextFunction } from "express";
-
-import { User } from "../src/models/UserModel";
-import { Merchant } from "../src/models/MerchantModel";
-import { server, app } from "../src/server";
+import { Request, Response, NextFunction } from "express";
 import UserService from "../src/services/userServices";
 import MerchantService from "../src/services/merchantService";
+import { error } from "console";
 
-app.use(express.json());
-// app.use(express.json());
-
+// Mock the services
 jest.mock("../src/services/userServices", () => ({
   createUser: jest.fn(),
   findUserByEmail: jest.fn(),
 }));
+
 jest.mock("../src/services/merchantService", () => ({
   createUser: jest.fn(),
   findMerchantByEmail: jest.fn(),
 }));
-const user = {
-  firstName: "John",
-  lastName: "Doe",
-  email: "john.doe@example.com",
-  phone: "+1234567890",
-  dateOfBirth: "1990-05-15",
-  password: "SecurePassword123",
-  address: "123 Main Street, Springfield, USA",
-  role: "user",
-};
 
-const merch = {
-  name: "John Doe",
-  email: "john.zdzf@example.com",
-  password: "securePassword123",
-  businessName: "John's Coffee Shop",
-  businessAddress: "123 Main Street, Springfield",
-  dateOfBirth: "1990-10-10",
-  phone: "+905340537088",
-  role: "merchant",
-};
-describe("Testing sign up", () => {
-  let req: Partial<Request>;
-  let res: Partial<Response>;
-  let next: NextFunction;
+describe("Auth Controller - Sign Up", () => {
+  // Test data
+  const mockUser = {
+    firstName: "John",
+    lastName: "Doe",
+    email: "john.doe@example.com",
+    phone: "+1234567890",
+    dateOfBirth: "1990-05-15",
+    password: "SecurePassword123",
+    address: "123 Main Street, Springfield, USA",
+    role: "user",
+  };
+
+  const mockMerchant = {
+    name: "John Doe",
+    email: "john.merchant@example.com",
+    password: "securePassword123",
+    businessName: "John's Coffee Shop",
+    businessAddress: "123 Main Street, Springfield",
+    dateOfBirth: "1990-10-10",
+    phone: "+905340537088",
+    role: "merchant",
+  };
+
+  // Setup request, response, and next function mocks
+  let mockRequest: Partial<Request>;
+  let mockResponse: Partial<Response>;
+  let nextFunction: NextFunction;
 
   beforeEach(() => {
-    res = {
+    mockResponse = {
       status: jest.fn().mockReturnThis(),
       json: jest.fn(),
     } as Partial<Response>;
-    next = jest.fn();
-  });
-  beforeEach(() => {
-    // Reset all mock instances and calls before each test
+    nextFunction = jest.fn();
+
+    // Clear all mocks before each test
     jest.clearAllMocks();
   });
-  it("Should return 201 When user is created successfully", async () => {
-    req = {
-      body: { ...user },
-    };
-    (UserService.createUser as jest.Mock).mockResolvedValue({
-      ...user,
-      user_id: 1,
+
+  describe("User Registration", () => {
+    it("should successfully create a new user and return 201", async () => {
+      mockRequest = {
+        body: { ...mockUser },
+      };
+
+      (UserService.findUserByEmail as jest.Mock).mockResolvedValue(null);
+      (UserService.createUser as jest.Mock).mockResolvedValue({
+        ...mockUser,
+        user_id: 1,
+      });
+
+      await signUp(mockRequest as Request, mockResponse as Response, nextFunction);
+
+      expect(mockResponse.status).toHaveBeenCalledWith(201);
+      expect(UserService.findUserByEmail).toHaveBeenCalledWith(mockUser.email);
+      expect(UserService.createUser).toHaveBeenCalledWith(mockUser);
     });
-    (UserService.findUserByEmail as jest.Mock).mockResolvedValue(null);
 
-    (MerchantService.createUser as jest.Mock).mockResolvedValue({ ...merch });
-    (MerchantService.findMerchantByEmail as jest.Mock).mockResolvedValue(null);
+    it("should return 400 if user email already exists", async () => {
+      mockRequest = {
+        body: { ...mockUser },
+      };
 
-    await signUp(req as Request, res as Response, next);
+      (UserService.findUserByEmail as jest.Mock).mockResolvedValue({ ...mockUser });
 
-    expect(res.status).toHaveBeenCalledWith(201);
-  });
+      await signUp(mockRequest as Request, mockResponse as Response, nextFunction);
 
-  it("Should return 201 When merchant is created successfully", async () => {
-    req = {
-      body: { ...merch },
-    };
-
-    (MerchantService.createUser as jest.Mock).mockResolvedValue({
-      ...merch,
-      merchant_id: 1,
+      expect(mockResponse.status).toHaveBeenCalledWith(400);
+      expect(mockResponse.json).toHaveBeenCalledWith(
+        expect.objectContaining({
+          message: expect.any(String)
+        })
+      );
     });
-    (MerchantService.findMerchantByEmail as jest.Mock).mockResolvedValue(null);
-
-    await signUp(req as Request, res as Response, next);
-
-    expect(res.status).toHaveBeenCalledWith(201);
   });
 
-  it("Should return 400 When there's invalid password field", async () => {
-    req = {
-      body: { ...merch, password: "bad" },
-    };
+  describe("Merchant Registration", () => {
+    it("should successfully create a new merchant and return 201", async () => {
+      mockRequest = {
+        body: { ...mockMerchant },
+      };
 
-    (MerchantService.createUser as jest.Mock).mockResolvedValue({
-      ...merch,
-      merchant_id: 1,
+      (MerchantService.findMerchantByEmail as jest.Mock).mockResolvedValue(null);
+      (MerchantService.createUser as jest.Mock).mockResolvedValue({
+        ...mockMerchant,
+        merchant_id: 1,
+      });
+
+      await signUp(mockRequest as Request, mockResponse as Response, nextFunction);
+
+      expect(mockResponse.status).toHaveBeenCalledWith(201);
+      expect(MerchantService.findMerchantByEmail).toHaveBeenCalledWith(mockMerchant.email);
+      expect(MerchantService.createUser).toHaveBeenCalledWith(mockMerchant);
     });
-    (MerchantService.findMerchantByEmail as jest.Mock).mockResolvedValue(null);
 
-    await signUp(req as Request, res as Response, next);
+    it("should return 400 if merchant email already exists", async () => {
+      mockRequest = {
+        body: { ...mockMerchant },
+      };
 
-    expect(res.status).toHaveBeenCalledWith(400);
-  });
+      (MerchantService.findMerchantByEmail as jest.Mock).mockResolvedValue({ ...mockMerchant });
 
-  it("Should return 400 When there's invalid email field", async () => {
-    req = {
-      body: { ...merch, email: "bad" },
-    };
+      await signUp(mockRequest as Request, mockResponse as Response, nextFunction);
 
-    (MerchantService.createUser as jest.Mock).mockResolvedValue({
-      ...merch,
-      merchant_id: 1,
+      expect(mockResponse.status).toHaveBeenCalledWith(400);
+      expect(mockResponse.json).toHaveBeenCalledWith(
+        expect.objectContaining({
+          message: expect.any(String)
+        })
+      );
     });
-    (MerchantService.findMerchantByEmail as jest.Mock).mockResolvedValue(null);
-
-    await signUp(req as Request, res as Response, next);
-
-    expect(res.status).toHaveBeenCalledWith(400);
   });
 
-  it("Should return 400 When there's invalid name field", async () => {
-    req = {
-      body: { ...merch, name: "bad" },
-    };
+  describe("Validation Tests", () => {
+    it("should return 400 for invalid password", async () => {
+      mockRequest = {
+        body: { ...mockMerchant, password: "bad" },
+      };
 
-    (MerchantService.createUser as jest.Mock).mockResolvedValue({
-      ...merch,
-      merchant_id: 1,
+      await signUp(mockRequest as Request, mockResponse as Response, nextFunction);
+
+      expect(mockResponse.status).toHaveBeenCalledWith(400);
     });
-    (MerchantService.findMerchantByEmail as jest.Mock).mockResolvedValue(null);
 
-    await signUp(req as Request, res as Response, next);
+    it("should return 400 for invalid email", async () => {
+      mockRequest = {
+        body: { ...mockMerchant, email: "invalid-email" },
+      };
 
-    expect(res.status).toHaveBeenCalledWith(400);
-  });
+      await signUp(mockRequest as Request, mockResponse as Response, nextFunction);
 
-  it("Should return 400 When there's invalid name field", async () => {
-    req = {
-      body: { ...merch, name: "bad" },
-    };
-    (MerchantService.findMerchantByEmail as jest.Mock).mockResolvedValue(true);
+      expect(mockResponse.status).toHaveBeenCalledWith(400);
+    });
 
-    (MerchantService.createUser as jest.Mock).mockResolvedValue(null);
+    it("should return 400 for invalid name", async () => {
+      mockRequest = {
+        body: { ...mockMerchant, name: "a" },
+      };
 
-    await signUp(req as Request, res as Response, next);
+      await signUp(mockRequest as Request, mockResponse as Response, nextFunction);
 
-    expect(res.status).toHaveBeenCalledWith(400);
-  });
-  afterAll(() => {
-    server.close(); // Close the server after the tests have finished
+      expect(mockResponse.status).toHaveBeenCalledWith(400);
+    });
   });
 });
