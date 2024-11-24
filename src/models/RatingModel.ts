@@ -30,6 +30,10 @@ export const Rating = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: false,
     },
+    review: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
   },
   {
     tableName: "rating",

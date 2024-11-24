@@ -65,6 +65,13 @@ export const Product = sequelize.define(
         isUrl: true,
       },
     },
+    brand_image_url: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      validate: {
+        isUrl: true,
+      },
+    },
     createdAt: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,

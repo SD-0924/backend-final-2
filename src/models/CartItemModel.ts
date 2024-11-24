@@ -3,11 +3,11 @@ import { DataTypes } from "sequelize";
 import { User } from "./UserModel";
 import { Product } from "./ProductModel";
 
-// Define the Wishlist model
-export const Wishlist = sequelize.define(
-  "Wishlist",
+// Define the Cart model
+export const CartItem = sequelize.define(
+  "CartItem",
   {
-    wishlist_Id: {
+    cartItem_id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
@@ -26,9 +26,13 @@ export const Wishlist = sequelize.define(
         key: "product_id",
       },
     },
+    quantity: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
   },
   {
-    tableName: "wishlist",
+    tableName: "cart_item",
     timestamps: false,
   }
 );
