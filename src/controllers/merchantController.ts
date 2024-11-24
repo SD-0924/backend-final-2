@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import MerchantService from "../services/merchantService";
-import * as Joi from "Joi";
+import Joi from "joi";
 
 // Validation schema
 const merchantSchema = Joi.object({

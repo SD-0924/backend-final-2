@@ -4,7 +4,7 @@ import { Request, Response } from "express";
 // Import services
 import { productService, createProduct, getProductByBrand } from "../services/productService";
 
-import JOI from "Joi";
+import JOI from "joi";
 
 //validate product brand name
 const schema = JOI.object({
