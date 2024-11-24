@@ -7,7 +7,7 @@ import { productRoutes } from "./routes/productRoutes";
 import merchantRoutes from "./routes/merchantRoutes";
 import { invalidRoute, invalidJSON } from "./middleware/errorHandler";
 import { signUp } from "./controllers/authController";
-// import 
+import wishlistRoutes from "./routes/wishlistRoutes"
 
 dotenv.config();
 
@@ -18,6 +18,7 @@ const PORT = Number(process.env.PORT) || 3000;
 
 app.use("/api", productRoutes);
 app.use("/api/", merchantRoutes);
+app.get("/api/wishlist", wishlistRoutes)
 
 // Middleware to handle invalid routes
 app.use(invalidRoute);
@@ -25,7 +26,6 @@ app.use(invalidRoute);
 // Middleware to handle invalid JSON structure
 app.use(invalidJSON);
 
-// app.get("/api/wishlist", wishlistRoutes)
 
 app.listen(PORT, async () => {
   // To create the tables, you need to convert the commented lines into normal code:
