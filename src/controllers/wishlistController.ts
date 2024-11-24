@@ -1,62 +1,56 @@
 import { Request, Response } from "express";
+import WishlistService from "../services/wishlistService";
 
-//This function adds product to wishlest
-export const addToWishlist = async (req: Request, res: Response) => {
-  try {
-    const userId = "1234566"; //should be req.user.id
-    const { productId } = req.body; // should get product id  from the request
+export default class WishlistController {
+  // Create a new wishlist item
+  static async createWishlistItem(req: Request, res: Response) {
+    const { userId, productId } = req.body;
 
-    // Check if the product already exists in the wishlist
-    const exists = await findeOneWishlistItem(); //this function finde product based on
-    if (exists) {
-      return res.status(400).json({ message: "Product already in wishlist" });
+    try {
+      const newWishlistItem = await WishlistService.createWishlistItem(
+        parseInt(userId),
+        parseInt(productId)
+      );
+
+      res.status(201).json(newWishlistItem);
+    } catch (error) {
+      res.status(500).json({ message: "Error creating wishlist item.", error });
     }
-
-    // Add product to the wishlist
-    const wishlistItem = await createWishlistItem();
-    res.status(201).json(wishlistItem);
-  } catch (error: any) {
-    res
-      .status(500)
-      .json({ message: "Error adding to wishlist", error: error.message });
   }
-};
 
-export const getWishlist = async (req: Request, res: Response) => {
-  try {
-    const userId = "req.user.id;";
+  // Get all wishlist items for a user
+  static async getAllWishlistItems(req: Request, res: Response) {
+    const { userId } = req.params;
 
-    // Fetch the wishlist items for the user
-    const wishlistItems = await findAllWishlistItems();
-    //User.findBPK(userid, {
-    // include: [{
-    //    Model: product
-    //  }]
-    // })
+    try {
+      const wishlistItems = await WishlistService.findAllWishlistItems(
+        parseInt(userId)
+      );
 
-    res.status(200).json(wishlistItems);
-  } catch (error: any) {
-    res
-      .status(500)
-      .json({ message: "Error fetching wishlist", error: error.message });
-  }
-};
-
-export const removeFromWishlist = async (req: Request, res: Response) => {
-  try {
-    const wishlistId = "req.wishlist.id;";
-
-    // Remove product from wishlist
-    const rowsDeleted = await destroyWishlistItem(); // wishlist.destroy(wishlistId)
-
-    if (rowsDeleted === 0) {
-      return res.status(404).json({ message: "Product not found in wishlist" });
+      res.status(200).json(wishlistItems);
+    } catch (error) {
+      res
+        .status(500)
+        .json({ message: "Error fetching wishlist items.", error });
     }
-
-    res.status(200).json({ message: "Product removed from wishlist" });
-  } catch (error: any) {
-    res
-      .status(500)
-      .json({ message: "Error removing from wishlist", error: error.message });
   }
-};
+
+  // Remove a wishlist item
+  static async deleteWishlistItem(req: Request, res: Response) {
+    const { wishlistId } = req.params;
+
+    try {
+      const deleted = await WishlistService.destroyWishlistItem(
+        parseInt(wishlistId)
+      );
+
+      if (!deleted) {
+        res.status(404).json({ message: "Wishlist item not found." });
+      }
+
+      res.status(200).json({ message: "Wishlist item deleted successfully." });
+    } catch (error) {
+      res.status(500).json({ message: "Error deleting wishlist item.", error });
+    }
+  }
+}

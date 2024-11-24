@@ -47,7 +47,3 @@ app.listen(PORT, async () => {
   //  await Admin.sync({ force: true });
   //  console.log("Admin model has been synced.");
 })
-
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-})}
