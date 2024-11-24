@@ -1,4 +1,4 @@
-import Joi from "Joi";
+import Joi from "joi";
 // const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+~`|}{[\]:;"'<>,.?/-])[A-Za-z\d!@#$%^&*()_+~`|}{[\]:;"'<>,.?/-]{8,30}$/;
 
 export function validateUserSignUp(user: object) {
