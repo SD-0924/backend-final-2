@@ -1,8 +1,8 @@
 // Import product model
 import { Product } from "../models/ProductModel";
 
-// Import rating model
-import { Rating } from "../models/RatingModel";
+// Import rating service
+import { ratingService } from "../services/ratingService";
 
 // Import category service
 import { categoryService } from "../services/categoryService";
@@ -60,16 +60,9 @@ export class productService {
   }
   // This method to add rating information to product information
   static async addRatingInfo(productInfo: any) {
-    const ratingInfo: any = await Rating.findAll({
-      attributes: [
-        [Sequelize.fn("COUNT", Sequelize.col("rating")), "number_of_ratings"],
-        [Sequelize.fn("AVG", Sequelize.col("rating")), "average_rating"],
-      ],
-      where: {
-        product_id: productInfo.product_id,
-      },
-      raw: true,
-    });
+    const ratingInfo: any = await ratingService.getProductRating(
+      productInfo.product_id
+    );
     productInfo.number_of_ratings = ratingInfo[0].number_of_ratings;
     if (ratingInfo[0].average_rating !== null) {
       productInfo.average_rating = parseFloat(
@@ -136,23 +129,13 @@ export class productService {
     const categoryInfo: any =
       await categoryService.getCategoryByName(categoryName);
     if (!categoryInfo) {
-      return [];
+      return {};
     }
     const products: any =
       await productCategoryService.getProductsBelongsToCategory(
-        categoryInfo.category_id
+        categoryInfo.category_id,
+        pageNumber
       );
-    // if (product === null) {
-    //   return {};
-    // }
-    // this.addDiscountInfo(product);
-    // await this.addRatingInfo(product);
-    // delete product.product_id;
-    // delete product.merchant_id;
-    // delete product.brand_name;
-    // delete product.createdAt;
-    // delete product.updatedAt;
-    // delete product.brand_image_url;
     return products;
   }
 }
