@@ -4,6 +4,12 @@ import { Product } from "../models/ProductModel";
 // Import rating model
 import { Rating } from "../models/RatingModel";
 
+// Import category service
+import { categoryService } from "../services/categoryService";
+
+// Import productCategory service
+import { productCategoryService } from "../services/productCategoryService";
+
 // Import Sequelize and Op from sequelize module
 import { Sequelize, Op } from "sequelize";
 
@@ -48,6 +54,7 @@ export class productService {
       delete product.brand_name;
       delete product.createdAt;
       delete product.updatedAt;
+      delete product.brand_image_url;
     }
     return products;
   }
@@ -99,32 +106,78 @@ export class productService {
       delete product.brand_name;
       delete product.createdAt;
       delete product.updatedAt;
+      delete product.brand_image_url;
     }
+    return products;
+  }
+  // This method to get a specific product based on id
+  static async findProductById(product_id: number) {
+    const product: any = await Product.findByPk(product_id, {
+      raw: true,
+    });
+    if (product === null) {
+      return {};
+    }
+    this.addDiscountInfo(product);
+    await this.addRatingInfo(product);
+    delete product.product_id;
+    delete product.merchant_id;
+    delete product.brand_name;
+    delete product.createdAt;
+    delete product.updatedAt;
+    delete product.brand_image_url;
+    return product;
+  }
+  // This method to get all products that belongs to category
+  static async findProductsByCategory(
+    categoryName: string,
+    pageNumber: number
+  ) {
+    const categoryInfo: any =
+      await categoryService.getCategoryByName(categoryName);
+    if (!categoryInfo) {
+      return [];
+    }
+    const products: any =
+      await productCategoryService.getProductsBelongsToCategory(
+        categoryInfo.category_id
+      );
+    // if (product === null) {
+    //   return {};
+    // }
+    // this.addDiscountInfo(product);
+    // await this.addRatingInfo(product);
+    // delete product.product_id;
+    // delete product.merchant_id;
+    // delete product.brand_name;
+    // delete product.createdAt;
+    // delete product.updatedAt;
+    // delete product.brand_image_url;
     return products;
   }
 }
 
 export const getProductByBrand = async (brand: string) => {
-  try{
-      const products = await Product.findAll({
-          where: {
-              brand_name: brand,
-          },
-      });
-      if (products.length === 0) {
-          return {status: 404, response: "No products found"};
-      }
-      return {status: 200, response: products};
+  try {
+    const products = await Product.findAll({
+      where: {
+        brand_name: brand,
+      },
+    });
+    if (products.length === 0) {
+      return { status: 404, response: "No products found" };
+    }
+    return { status: 200, response: products };
   } catch (error) {
-      return {status: 500, response: error};
+    return { status: 500, response: error };
   }
 };
 
 export const createProduct = async (product: any) => {
   try {
-      const newProduct = await Product.create(product);
-      return { status: 201, response: newProduct };
+    const newProduct = await Product.create(product);
+    return { status: 201, response: newProduct };
   } catch (error) {
-      return { status: 500, response: error };
+    return { status: 500, response: error };
   }
 };

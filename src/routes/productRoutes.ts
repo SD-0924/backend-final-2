@@ -9,5 +9,20 @@ productRoutes.get("/newArrivals", productController.getNewArrivalsProducts);
 // Route for get all products based on user search
 productRoutes.get("/search/:text", productController.findProductsByText);
 
-productRoutes.get("/product/brand/:brandName", productController.getProductsByBrand as any);
-productRoutes.post("/product/create", productController.createProductController as any);
+// Route for get a specific product based on id
+productRoutes.get("/product/:id", productController.findProductById);
+
+// Route for get all products that are related to category
+productRoutes.get(
+  "/products/:category",
+  productController.findProductsByCategory
+);
+
+productRoutes.get(
+  "/product/brand/:brandName",
+  productController.getProductsByBrand as any
+);
+productRoutes.post(
+  "/product/create",
+  productController.createProductController as any
+);
