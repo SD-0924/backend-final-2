@@ -88,7 +88,7 @@ export const login = async (
   next: NextFunction
 ) => {
 
-  const{value,error} = validateLoginUser(req.body());
+  const{value,error} = validateLoginUser(req.body);
 
   if (error) {
     res.status(400).send(error + '')
