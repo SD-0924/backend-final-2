@@ -9,10 +9,9 @@ import { invalidRoute, invalidJSON } from "./middleware/errorHandler";
 import { signUp } from "./controllers/authController";
 
 dotenv.config();
-
+// dotenv.configDotenv();
 export const app = express();
 app.use(express.json());
-
 const PORT = Number(process.env.PORT) || 3000;
 
 app.use("/api", productRoutes);
@@ -36,7 +35,7 @@ app.listen(PORT, async () => {
   // setupAssociations();
   // console.log("Associations are set up.");
   // console.log("Syncing Sequelize...");
-  // await sequelize.sync({ force: true });
+  // await sequelize.sync();
   // console.log("Sequelize has been synced.");
   // console.log("Syncing Admin model...");
   // await Admin.sync({ force: true });
