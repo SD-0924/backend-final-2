@@ -7,20 +7,14 @@ import { productRoutes } from './routes/productRoutes'
 import merchantRoutes from './routes/merchantRoutes'
 import { invalidRoute, invalidJSON } from './middleware/errorHandler'
 import { signUp } from './controllers/authController'
-import { imageRouter } from './routes/uploadImageRoutes'
-import { authRouter } from './routes/authRoutes'
+import wishlistRoutes from './routes/wishlistRoutes'
 
 dotenv.config()
-
+// dotenv.configDotenv();
 export const app = express()
 app.use(express.json())
-
 const PORT = Number(process.env.PORT) || 3000
 
-app.use('/api', productRoutes)
-app.use('/api/', merchantRoutes)
-app.use('/api', imageRouter)
-app.use('/api', authRouter)
 app.use('/api', productRoutes)
 app.use('/api/', merchantRoutes)
 app.get('/api/wishlist', wishlistRoutes)
@@ -29,7 +23,6 @@ app.get('/api/wishlist', wishlistRoutes)
 app.use(invalidRoute)
 
 // Middleware to handle invalid JSON structure
-app.use(invalidJSON)
 app.use(invalidJSON)
 
 app.listen(PORT, async () => {
