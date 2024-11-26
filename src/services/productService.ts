@@ -102,29 +102,40 @@ export class productService {
     }
     return products;
   }
+
+  // This method to get all brands
+
+  static async getBrandsService() {
+    const brands = await Product.findAll({
+      attributes: ["brand_image_url", "brand_name"],
+      group: ["brand_name", "brand_image_url"],
+    });
+    console.log(brands);
+    return brands.map((e) => e.dataValues);
+  }
 }
 
 export const getProductByBrand = async (brand: string) => {
-  try{
-      const products = await Product.findAll({
-          where: {
-              brand_name: brand,
-          },
-      });
-      if (products.length === 0) {
-          return {status: 404, response: "No products found"};
-      }
-      return {status: 200, response: products};
+  try {
+    const products = await Product.findAll({
+      where: {
+        brand_name: brand,
+      },
+    });
+    if (products.length === 0) {
+      return { status: 404, response: "No products found" };
+    }
+    return { status: 200, response: products };
   } catch (error) {
-      return {status: 500, response: error};
+    return { status: 500, response: error };
   }
 };
 
 export const createProduct = async (product: any) => {
   try {
-      const newProduct = await Product.create(product);
-      return { status: 201, response: newProduct };
+    const newProduct = await Product.create(product);
+    return { status: 201, response: newProduct };
   } catch (error) {
-      return { status: 500, response: error };
+    return { status: 500, response: error };
   }
 };
