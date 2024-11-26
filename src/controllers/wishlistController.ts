@@ -13,9 +13,10 @@ export default class WishlistController {
       isNaN(parseInt(userId)) ||
       isNaN(parseInt(productId))
     ) {
-      return res.status(400).json({
+      res.status(400).json({
         message: "Invalid userId or productId. They must be valid numbers.",
       });
+      return;
     }
 
     try {
@@ -36,9 +37,10 @@ export default class WishlistController {
 
     // Input validation
     if (!userId || isNaN(parseInt(userId))) {
-      return res.status(400).json({
+      res.status(400).json({
         message: "Invalid userId. It must be a valid number.",
       });
+      return;
     }
 
     try {
@@ -60,9 +62,10 @@ export default class WishlistController {
 
     // Input validation
     if (!wishlistId || isNaN(parseInt(wishlistId))) {
-      return res.status(400).json({
+      res.status(400).json({
         message: "Invalid wishlistId. It must be a valid number.",
       });
+      return;
     }
 
     try {
@@ -71,7 +74,8 @@ export default class WishlistController {
       );
 
       if (!deleted) {
-        return res.status(404).json({ message: "Wishlist item not found." });
+        res.status(404).json({ message: "Wishlist item not found." });
+        return;
       }
 
       res.status(200).json({ message: "Wishlist item deleted successfully." });
