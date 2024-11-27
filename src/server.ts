@@ -7,6 +7,8 @@ import { productRoutes } from "./routes/productRoutes";
 import merchantRoutes from "./routes/merchantRoutes";
 import { invalidRoute, invalidJSON } from "./middleware/errorHandler";
 import { signUp } from "./controllers/authController";
+
+import { imageRouter } from "./routes/uploadImageRoutes";
 import wishlistRoutes from "./routes/wishlistRoutes";
 
 dotenv.config();
@@ -17,6 +19,7 @@ const PORT = Number(process.env.PORT) || 3000;
 
 app.use("/api", productRoutes);
 app.use("/api/", merchantRoutes);
+app.use("/api", imageRouter);
 app.get("/api/wishlist", wishlistRoutes);
 
 // Middleware to handle invalid routes
@@ -33,7 +36,6 @@ app.listen(PORT, async () => {
   // await connectToDB();
   // console.log("Connected to DB successfully.");
   console.log("Setting up associations...");
-
   setupAssociations();
   console.log("Associations are set up.");
   // console.log("Syncing Sequelize...");
