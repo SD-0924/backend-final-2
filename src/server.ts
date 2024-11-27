@@ -11,6 +11,10 @@ import { signUp } from "./controllers/authController";
 import { imageRouter } from "./routes/uploadImageRoutes";
 import wishlistRoutes from "./routes/wishlistRoutes";
 
+//import colors
+import colors from "colors";
+import { col } from "sequelize";
+
 dotenv.config();
 // dotenv.configDotenv();
 export const app = express();
@@ -30,21 +34,17 @@ app.use(invalidJSON);
 
 app.listen(PORT, async () => {
   // To create the tables, you need to convert the commented lines into normal code:
-
-  // console.log("Connecting to DB...");
-
-  // await connectToDB();
-  // console.log("Connected to DB successfully.");
-  console.log("Setting up associations...");
-  setupAssociations();
-  console.log("Associations are set up.");
-  // console.log("Syncing Sequelize...");
-  // await sequelize.sync({force: true});
-  // console.log("Sequelize has been synced.");
-  // console.log("Syncing Admin model...");
-
-  // await Admin.sync({ force: true });
-  // console.log("Admin model has been synced.");
-
-  // console.log(`Server is running on port ${PORT}`);
+  console.log(colors.blue("Connecting to DB..."));
+  await connectToDB();
+  console.log(colors.green("Connected to DB successfully."));
+                // console.log(colors.blue("Setting up associations..."));
+                // setupAssociations();
+                // console.log(colors.green("Associations are set up."));
+                // console.log(colors.blue("Syncing Sequelize..."));
+                // await sequelize.sync({force: true});
+                // console.log(colors.green("Sequelize has been synced."));
+                // console.log(colors.blue("Syncing Admin model..."));
+                // await Admin.sync({ force: true });
+                // console.log(colors.green("Admin model has been synced."));
+  console.log(colors.bold.white(`Server is running on port ${PORT}`));
 });
