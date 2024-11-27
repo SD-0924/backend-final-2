@@ -24,7 +24,7 @@ const PORT = Number(process.env.PORT) || 3000;
 app.use("/api", productRoutes);
 app.use("/api/", merchantRoutes);
 app.use("/api", imageRouter);
-app.get("/api/wishlist", wishlistRoutes);
+app.use("/api/wishlist", wishlistRoutes);
 
 // Middleware to handle invalid routes
 app.use(invalidRoute);
