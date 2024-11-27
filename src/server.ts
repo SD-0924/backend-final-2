@@ -7,6 +7,7 @@ import { productRoutes } from "./routes/productRoutes";
 import merchantRoutes from "./routes/merchantRoutes";
 import { invalidRoute, invalidJSON } from "./middleware/errorHandler";
 import { signUp } from "./controllers/authController";
+import { imageRouter } from "./routes/uploadImageRoutes";
 
 dotenv.config();
 
@@ -17,6 +18,7 @@ const PORT = Number(process.env.PORT) || 3000;
 
 app.use("/api", productRoutes);
 app.use("/api/", merchantRoutes);
+app.use("/api", imageRouter);
 
 // Middleware to handle invalid routes
 app.use(invalidRoute);
