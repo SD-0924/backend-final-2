@@ -90,7 +90,10 @@ export const login = async (
   const { value, error } = validateLoginUser(req.body)
 
   if (error) {
-    res.status(400).send(error + '')
+    console.log(error.message)
+    res.status(400).json({
+      message: error.message,
+    })
     return
   }
 
@@ -100,16 +103,18 @@ export const login = async (
     res.status(404).send('your email or password ')
   } else {
     const payload = {
-      id: user.dataValues.id,
+      id: user.dataValues?.user_id,
       role: value.role,
     }
 
     //check if the password is correct
-    if (await bcrypt.compare(value.password, user.dataValues.password)) {
+    if (await bcrypt.compare(value.password, user.dataValues?.password)) {
       const token = generateToken(payload)
       res.status(200).json({ token })
     } else {
-      throw new Error('your email or password is wrong')
+      res.status(404).json({
+        message: 'your password is wrong',
+      })
     }
   }
 }
