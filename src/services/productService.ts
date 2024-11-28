@@ -30,32 +30,44 @@ export class productService {
       productInfo.price_after_discount.toFixed(CONSTANTS.DISCOUNT_PRECISION)
     )
   }
-  // This method to get new arrivals products
+  
+  // Method to retrieve new arrival products
   static async getNewArrivalsProducts() {
-    const currentMonth: number = new Date().getMonth() + 1
-    let targetMonth: number = 0
-    if (currentMonth >= 4 && currentMonth <= 12) {
-      targetMonth = currentMonth - 3
-    } else {
-      targetMonth = CONSTANTS.MONTH_MAPPING[currentMonth]
+    const currentDate = new Date();
+
+    // Calculate the start date of the previous three months
+    const threeMonthsAgo = new Date();
+    threeMonthsAgo.setMonth(currentDate.getMonth() - 3);
+
+    try {
+      // Fetch products created within the last three months
+      const newProducts: any[] = await Product.findAll({
+        where: {
+          createdAt: {
+            [Op.between]: [threeMonthsAgo, currentDate],
+          },
+        },
+        raw: true,
+      });
+
+      // Process products and clean up fields
+      newProducts.forEach((product) => {
+        this.addDiscountInfo(product); // Add discount info
+        // Remove unwanted fields
+        [
+          'stock',
+          'merchant_id',
+          'brand_name',
+          'createdAt',
+          'updatedAt',
+        ].forEach((field) => delete product[field]);
+      });
+
+      return newProducts;
+    } catch (error) {
+      console.error('Error fetching new arrivals:', error);
+      throw new Error('Failed to fetch new arrival products.');
     }
-    const products: any = await Product.findAll({
-      where: Sequelize.where(
-        Sequelize.fn('MONTH', Sequelize.col('createdAt')),
-        targetMonth
-      ),
-      raw: true,
-    })
-    for (const product of products) {
-      this.addDiscountInfo(product)
-      delete product[FIELD_NAMES.STOCK]
-      delete product[FIELD_NAMES.MERCHANT_ID]
-      delete product[FIELD_NAMES.DESCRIPTION]
-      delete product[FIELD_NAMES.CREATED_AT]
-      delete product[FIELD_NAMES.UPDATED_AT]
-      delete product[FIELD_NAMES.BRAND_IMAGE_URL]
-    }
-    return products
   }
   // This method to add rating information to product information
   static async addRatingInfo(productInfo: any) {
