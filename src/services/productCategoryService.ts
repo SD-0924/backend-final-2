@@ -1,3 +1,6 @@
+// Import the constants
+import { FIELD_NAMES, PAGINATION } from "../constants";
+
 // Import product service
 import { productService } from "./productService";
 
@@ -23,29 +26,37 @@ export class productCategoryService {
     const products: any = await sequelize.query(query, {
       replacements: {
         categoryId: category_id,
-        limit: 9,
-        offset: (page_number - 1) * 9,
+        limit: PAGINATION.DEFAULT_PAGE_SIZE,
+        offset: (page_number - 1) * PAGINATION.DEFAULT_PAGE_SIZE,
       },
       type: QueryTypes.SELECT,
     });
     const result: any = {};
 
     if (products.length !== 0) {
-      if (products[0].totalCount % 9 === 0) {
-        result.number_of_pages = Math.floor(products[0].totalCount / 9);
+      if (
+        products[0][FIELD_NAMES.TOTAL_COUNT] % PAGINATION.DEFAULT_PAGE_SIZE ===
+        0
+      ) {
+        result.number_of_pages = Math.floor(
+          products[0][FIELD_NAMES.TOTAL_COUNT] / PAGINATION.DEFAULT_PAGE_SIZE
+        );
       } else {
-        result.number_of_pages = Math.floor(products[0].totalCount / 9) + 1;
+        result.number_of_pages =
+          Math.floor(
+            products[0][FIELD_NAMES.TOTAL_COUNT] / PAGINATION.DEFAULT_PAGE_SIZE
+          ) + 1;
       }
       for (const product of products) {
         productService.addDiscountInfo(product);
         await productService.addRatingInfo(product);
-        delete product.stock;
-        delete product.merchant_id;
-        delete product.brand_name;
-        delete product.brand_image_url;
-        delete product.createdAt;
-        delete product.updatedAt;
-        delete product.totalCount;
+        delete product[FIELD_NAMES.STOCK];
+        delete product[FIELD_NAMES.DESCRIPTION];
+        delete product[FIELD_NAMES.MERCHANT_ID];
+        delete product[FIELD_NAMES.BRAND_IMAGE_URL];
+        delete product[FIELD_NAMES.CREATED_AT];
+        delete product[FIELD_NAMES.UPDATED_AT];
+        delete product[FIELD_NAMES.TOTAL_COUNT];
       }
       result.products = products;
     }
