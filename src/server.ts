@@ -1,3 +1,4 @@
+
 import express from "express";
 import dotenv from "dotenv";
 import { Admin } from "./models/AdminModel";
@@ -7,33 +8,39 @@ import { productRoutes } from "./routes/productRoutes";
 import merchantRoutes from "./routes/merchantRoutes";
 import { invalidRoute, invalidJSON } from "./middleware/errorHandler";
 import { signUp } from "./controllers/authController";
-import authRoutes from "./routes/authRoutes";
+// import authRoutes from "./routes/authRoutes";
 
 import profileRoutes from "./routes/profileRoutes";
 
 
 
-dotenv.config();
 
-export const app = express();
-app.use(express.json());
+import { imageRouter } from './routes/uploadImageRoutes'
+import wishlistRoutes from './routes/wishlistRoutes'
 
-const PORT = Number(process.env.PORT) || 3000;
+dotenv.config()
+// dotenv.configDotenv();
+export const app = express()
+app.use(express.json())
+const PORT = Number(process.env.PORT) || 3000
 
-app.use("/api", productRoutes);
-app.use("/api/", merchantRoutes);
-app.use("/api/auth", authRoutes);
-app.use("/api/user", profileRoutes);
+
+app.use('/api', productRoutes)
+app.use('/api/', merchantRoutes)
+app.use('/api', imageRouter)
+app.use('/api/wishlist', wishlistRoutes)
+// app.use('/api', authRouter)
+
+
 // Middleware to handle invalid routes
-app.use(invalidRoute);
+app.use(invalidRoute)
 
 // Middleware to handle invalid JSON structure
-app.use(invalidJSON);
+app.use(invalidJSON)
 
 app.listen(PORT, async () => {
-  console.log(`Server is running on port ${PORT}`);
-
   // To create the tables, you need to convert the commented lines into normal code:
+
 
   console.log("Connecting to DB...");
   await connectToDB();
@@ -44,7 +51,11 @@ app.listen(PORT, async () => {
   console.log("Syncing Sequelize...");
   await sequelize.sync({ force: true });
   console.log("Sequelize has been synced.");
+
   // console.log("Syncing Admin model...");
+
   // await Admin.sync({ force: true });
-  // console.log("Admin model has been synced.");
-});
+  // console.log("Admin model has been synced.");
+
+  // console.log(`Server is running on port ${PORT}`);
+})

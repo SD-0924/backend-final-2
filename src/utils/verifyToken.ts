@@ -36,11 +36,13 @@ export const verifyToken = async (
     const decodedToken = jwt.verify(
       token,
       process.env.JWT_SECRET || ''
+
     ) as JwtPayload;
     // (req as CustomRequest).token = decodedToken
     // console.log("VerifyToken Middleware: Token verified successfully.");
     req.token = decodedToken;
     console.log("VerifyToken Middleware: Token verified successfully. Decoded token:", decodedToken);
+
 
     next()
   } catch (err: any) {
