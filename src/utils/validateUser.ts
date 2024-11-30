@@ -58,3 +58,22 @@ export function validateMerchantSignUp(user: object) {
 
   return { value, error };
 }
+
+
+export function validateLoginUser(user: object){
+  const schema = Joi.object({
+    email: Joi.string().email({
+      minDomainSegments:2,
+      tlds:{allow:["com","net","org","io"]}
+    }).required(),
+    password:Joi.string()
+    .pattern(new RegExp("^[a-zA-Z0-9]{3,30}$"))
+    .min(6)
+    .max(30)
+    .required(),
+    role: Joi.string().valid("user").required(),
+
+  });
+  const {value,error} = schema.validate(user);
+  return {value,error};
+}

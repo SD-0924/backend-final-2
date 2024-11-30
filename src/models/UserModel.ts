@@ -2,14 +2,51 @@
 import { sequelize } from "../config/db";
 
 // Import DataTypes from sequelize module
-import { DataTypes } from "sequelize";
+import { DataTypes, Model, Optional } from "sequelize";
 
 // Import bcrypt from bcryptjs to encrypt password
 import bcrypt from "bcrypt";
 
+
+export interface UserAttributes {
+  user_id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone?: string | null;
+  dateOfBirth?: Date | null;
+  password: string;
+  address?: string | null;
+  profilePicture?: string | null;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+// Define the optional fields for creating a new user
+export interface UserCreationAttributes extends Optional<UserAttributes, "user_id" | "createdAt" | "updatedAt"> {}
+
+// Extend Sequelize's Model class
+export class User extends Model<UserAttributes, UserCreationAttributes> implements UserAttributes {
+  public user_id!: number;
+  public firstName!: string;
+  public lastName!: string;
+  public email!: string;
+  public phone!: string | null;
+  public dateOfBirth!: Date | null;
+  public password!: string;
+  public address!: string | null;
+  public profilePicture!: string|null;
+
+  public readonly createdAt!: Date;
+  public readonly updatedAt!: Date;
+
+  // Instance method for validating password
+  public async validatePassword(password: string): Promise<boolean> {
+    return bcrypt.compare(password, this.password);
+  }
+}
 // Define the User model
-export const User = sequelize.define(
-  "User",
+User.init(
   {
     user_id: {
       type: DataTypes.INTEGER,
@@ -45,6 +82,10 @@ export const User = sequelize.define(
         this.setDataValue("password", hashedPassword);
       },
     },
+    profilePicture: {
+      type: DataTypes.STRING,
+      allowNull:true,
+    },
     address: {
       type: DataTypes.STRING,
       allowNull: true,
@@ -59,7 +100,9 @@ export const User = sequelize.define(
     },
   },
   {
+    sequelize,
     tableName: "user",
     timestamps: true,
   }
 );
+

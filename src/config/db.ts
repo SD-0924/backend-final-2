@@ -4,7 +4,7 @@ import { Sequelize } from "sequelize";
 // Load environment variables
 import dotenv from "dotenv";
 
-dotenv.config({ path: "../.env" });
+dotenv.config();
 
 // Initialize Sequelize with MySQL database credentials
 export const sequelize = new Sequelize(
@@ -54,3 +54,4 @@ export const closeDb = async () => {
     }
   }
 };
+

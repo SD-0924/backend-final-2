@@ -5,6 +5,7 @@ import { configDotenv } from 'dotenv'
 import {
   validateUserSignUp,
   validateMerchantSignUp,
+  validateLoginUser,
 } from '../utils/validateUser'
 import MerchantService from '../services/merchantService'
 import bcrypt from 'bcrypt'
@@ -86,20 +87,26 @@ export const login = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { email, password, role } = req.body()
 
-  const user = await UserService.findUserByEmail(email)
+  const{value,error} = validateLoginUser(req.body);
+
+  if (error) {
+    res.status(400).send(error + '')
+    return
+  }
+
+  const user = await UserService.findUserByEmail(value.email)
 
   if (!user) {
     res.status(404).send('your email or password ')
   } else {
     const payload = {
-      id: user.dataValues.id,
-      role,
+      id: user.dataValues.user_id,
+      role:value.role,
     }
 
     //check if the password is correct
-    if (await bcrypt.compare(password, user.dataValues.password)) {
+    if (await bcrypt.compare(value.password, user.dataValues.password)) {
       const token = generateToken(payload)
       res.status(200).json({ token })
     } else {
