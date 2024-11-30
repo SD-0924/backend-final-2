@@ -87,7 +87,7 @@ export const login = async (
   res: Response,
   next: NextFunction
 ) => {
- HEAD
+
 
   const{value,error} = validateLoginUser(req.body);
 
