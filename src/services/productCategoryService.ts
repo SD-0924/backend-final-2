@@ -7,6 +7,9 @@ import { productService } from './productService'
 // Import Sequelize instance
 import { sequelize } from '../config/db'
 import { QueryTypes } from 'sequelize'
+import { Category } from '../models/CategoryModel'
+import { Product } from '../models/ProductModel'
+import { Op } from 'sequelize'
 
 export class productCategoryService {
   // This function to get all products that belongs to category based on pagination
@@ -61,5 +64,29 @@ export class productCategoryService {
       result.products = products
     }
     return result
+  }
+
+  static async handPickedService(category_id: number, page: number) {
+    const categoryProducts = Product.findAll({
+      where: {
+        price: {
+          [Op.lt]: 100,
+        },
+        //TODO:Rating grater than or equals 4.5
+      },
+      include: [
+        {
+          model: Category,
+          attributes: ['name'],
+          through: { attributes: [] },
+          where: {
+            category_id,
+          },
+        },
+      ],
+      limit: PAGINATION.DEFAULT_PAGE_SIZE,
+      offset: (page - 1) * PAGINATION.DEFAULT_PAGE_SIZE,
+    })
+    return categoryProducts
   }
 }
