@@ -41,7 +41,7 @@ app.listen(PORT, async () => {
   setupAssociations()
   console.log('Associations are set up.')
   // console.log("Syncing Sequelize...");
-  // await sequelize.sync({force: true});
+  // await sequelize.sync({alter: true});
   // console.log("Sequelize has been synced.");
   // console.log("Syncing Admin model...");
 
