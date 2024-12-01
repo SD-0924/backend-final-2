@@ -155,7 +155,7 @@ export const setupAssociations = () => {
   CartItem.belongsTo(Product, {
     foreignKey: "product_id",
   });
-  
+
   //success message
   console.log(colors.green("Models associations created successfully."));
 };
