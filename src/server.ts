@@ -7,6 +7,7 @@ import { productRoutes } from "./routes/productRoutes";
 import merchantRoutes from "./routes/merchantRoutes";
 import { invalidRoute, invalidJSON } from "./middleware/errorHandler";
 import { signUp } from "./controllers/authController";
+
 import authRoutes from "./routes/authRoutes";
 import profileRoutes from "./routes/profileRoutes"
 
@@ -14,8 +15,11 @@ import { imageRouter } from "./routes/uploadImageRoutes";
 import wishlistRoutes from "./routes/wishlistRoutes";
 
 
+
 dotenv.config();
+
 // dotenv.configDotenv();
+
 
 export const app = express();
 app.use(express.json());
