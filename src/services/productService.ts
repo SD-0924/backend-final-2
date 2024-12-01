@@ -14,7 +14,7 @@ import { categoryService } from '../services/categoryService'
 import { productCategoryService } from '../services/productCategoryService'
 
 // Import Sequelize and Op from sequelize module
-import { Sequelize, Op } from 'sequelize'
+import { Op } from 'sequelize'
 
 export class productService {
   // This method to add discount information to product information
@@ -30,14 +30,13 @@ export class productService {
       productInfo.price_after_discount.toFixed(CONSTANTS.DISCOUNT_PRECISION)
     )
   }
-  
   // Method to retrieve new arrival products
   static async getNewArrivalsProducts() {
-    const currentDate = new Date();
+    const currentDate = new Date()
 
     // Calculate the start date of the previous three months
-    const threeMonthsAgo = new Date();
-    threeMonthsAgo.setMonth(currentDate.getMonth() - 3);
+    const threeMonthsAgo = new Date()
+    threeMonthsAgo.setMonth(currentDate.getMonth() - 3)
 
     try {
       // Fetch products created within the last three months
@@ -48,39 +47,25 @@ export class productService {
           },
         },
         raw: true,
-      });
+        attributes: [
+          'product_id',
+          'name',
+          'price',
+          'brand_name',
+          'discount_percentage',
+          'product_image_url',
+        ],
+      })
 
       // Process products and clean up fields
       newProducts.forEach((product) => {
-        this.addDiscountInfo(product); // Add discount info
-        // Remove unwanted fields
-        [
-          'stock',
-          'merchant_id',
-          'brand_name',
-          'createdAt',
-          'updatedAt',
-        ].forEach((field) => delete product[field]);
-      });
+        this.addDiscountInfo(product) // Add discount info
+      })
 
-      return newProducts;
+      return newProducts
     } catch (error) {
-      console.error('Error fetching new arrivals:', error);
-      throw new Error('Failed to fetch new arrival products.');
-    }
-  }
-  // This method to add rating information to product information
-  static async addRatingInfo(productInfo: any) {
-    const ratingInfo: any = await ratingService.getProductRating(
-      productInfo[FIELD_NAMES.PRODUCT_ID]
-    )
-    productInfo.number_of_ratings = ratingInfo[0].number_of_ratings
-    if (ratingInfo[0].average_rating !== RATING.DEFAULT_RATING) {
-      productInfo.average_rating = parseFloat(
-        Number(ratingInfo[0].average_rating).toFixed(RATING.PRECISION)
-      )
-    } else {
-      productInfo.average_rating = ratingInfo[0].average_rating
+      console.error('Error fetching new arrivals:', error)
+      throw new Error('Failed to fetch new arrival products.')
     }
   }
   // This method to get all products that matched user search
@@ -100,17 +85,20 @@ export class productService {
           },
         ],
       },
+      attributes: [
+        'product_id',
+        'name',
+        'price',
+        'brand_name',
+        'discount_percentage',
+        'product_image_url',
+        'averageRating',
+        'NumberOfRatings',
+      ],
       raw: true,
     })
     for (const product of products) {
       this.addDiscountInfo(product)
-      await this.addRatingInfo(product)
-      delete product[FIELD_NAMES.STOCK]
-      delete product[FIELD_NAMES.DESCRIPTION]
-      delete product[FIELD_NAMES.MERCHANT_ID]
-      delete product[FIELD_NAMES.CREATED_AT]
-      delete product[FIELD_NAMES.UPDATED_AT]
-      delete product[FIELD_NAMES.BRAND_IMAGE_URL]
     }
     return products
   }
@@ -118,17 +106,23 @@ export class productService {
   static async findProductById(product_id: number) {
     const product: any = await Product.findByPk(product_id, {
       raw: true,
+      attributes: [
+        'product_id',
+        'name',
+        'description',
+        'price',
+        'stock',
+        'brand_name',
+        'discount_percentage',
+        'product_image_url',
+        'averageRating',
+        'NumberOfRatings',
+      ],
     })
     if (product === null) {
       return {}
     }
     this.addDiscountInfo(product)
-    await this.addRatingInfo(product)
-    delete product[FIELD_NAMES.PRODUCT_ID]
-    delete product[FIELD_NAMES.MERCHANT_ID]
-    delete product[FIELD_NAMES.CREATED_AT]
-    delete product[FIELD_NAMES.UPDATED_AT]
-    delete product[FIELD_NAMES.BRAND_IMAGE_URL]
     return product
   }
   // This method to get all products that belongs to category
