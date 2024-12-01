@@ -73,21 +73,28 @@ export const updatePassword = async (
     }
 
     
+        console.log("Current password provided:", currentPassword);
+        console.log("Current user password hash:", user.password);
 
-    //check if password was changed in the last 24 hours
-    if(user.lastPasswordChange){
-      const lastChange = dayjs(user.lastPasswordChange);
+     /// Check the last password change date to implement rate limiting
+    if (user.lastPasswordChange) {
       const now = dayjs();
-      if(now.diff(lastChange, 'hour')<24){
-        res.status(429).json({//429 status means too many requests error
-          message:"Password can only be changed once every 24 hours",
-        });
+      const lastPasswordChange = dayjs(user.lastPasswordChange);
+      const hoursSinceLastChange = now.diff(lastPasswordChange, 'hour');
+
+      console.log(`Hours since last password change: ${hoursSinceLastChange}`);
+      
+      if (hoursSinceLastChange < 24) {
+        console.log("Password change rate limiting enforced. Less than 24 hours since last change.");
+        res.status(429).json({ message: "Password can only be changed once every 24 hours." });
         return;
       }
+    } else {
+      console.log("No lastPasswordChange recorded, allowing password change.");
     }
 
-    console.log("Current password provided:", currentPassword);
-    console.log("Current user password hash:", user.password);
+
+    
 
     //verify current password
     const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
@@ -99,8 +106,8 @@ export const updatePassword = async (
     //update the password in the database
     await UserService.updateUserPassword(userId, newPassword);
     
-    //update the lastPasswordChange timestamp
-    await UserService.updateLastPasswordChange(userId);
+    // //update the lastPasswordChange timestamp
+    // await UserService.updateLastPasswordChange(userId);
 
     //respond to the client
     res.status(200).json({ message: "Password updated successfully." });

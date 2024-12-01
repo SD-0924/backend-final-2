@@ -9,6 +9,8 @@ import merchantRoutes from "./routes/merchantRoutes";
 import { invalidRoute, invalidJSON } from "./middleware/errorHandler";
 import { signUp } from "./controllers/authController";
 // import authRoutes from "./routes/authRoutes";
+import authRoutes from "./routes/authRoutes";
+
 
 import profileRoutes from "./routes/profileRoutes";
 
@@ -28,8 +30,11 @@ const PORT = Number(process.env.PORT) || 3000
 app.use('/api', productRoutes)
 app.use('/api/', merchantRoutes)
 app.use('/api', imageRouter)
+
+app.use("/api/auth", authRoutes);
+
 app.use('/api/wishlist', wishlistRoutes)
-app.use('/api', profileRoutes)
+app.use('/api/user', profileRoutes)
 // app.use('/api', authRouter)
 
 

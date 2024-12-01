@@ -45,7 +45,8 @@ export default class UserService {
         "dateOfBirth",
         "password",
         // "address",
-         "profilePicture",
+        "profilePicture",
+        "lastPasswordChange",
       ],
     });
 
@@ -62,24 +63,16 @@ export default class UserService {
     if(!user){
       throw new Error(`User with ID ${userId} not found.`);
     }
-
+    
     user.password = newPassword;//assign the hashwd password directly
-    await user.save(); //save the changes
-  }
 
-  
-  static async updateLastPasswordChange(userId:number){
-    const user = await User.findOne({
-      where:{
-        user_id:userId,
-      },
-    });
-
-    if(!user){
-      throw new Error(`User with ID ${userId} not found.`);
-    }
+    console.log("Updating lastPasswordChange to:", new Date());
     user.lastPasswordChange = new Date();
-    await user.save();
+    await user.save(); //save the changes
+    console.log("Updated user after password change:", user);
+    console.log("Updated lastPasswordChange:", user.lastPasswordChange); // Log for verification
+
   }
+
 }
 
