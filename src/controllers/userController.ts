@@ -1,6 +1,8 @@
 import { Request, Response, NextFunction } from "express";
 import UserService from "../services/userServices";
 import bcrypt from "bcrypt";
+import dayjs from "dayjs";
+
 
 export const getUserProfile = async (req: Request, res: Response, next: NextFunction) :Promise<void> => {
   try {
@@ -41,7 +43,11 @@ export const getUserProfile = async (req: Request, res: Response, next: NextFunc
 
 
 
-export const updatePassword = async (req: Request, res: Response, next: NextFunction):Promise<void> => {
+export const updatePassword = async (
+  req: Request, 
+  res: Response, 
+  next: NextFunction
+):Promise<void> => {
   try{
     const userId = (req as any).token.id;
     const {currentPassword, newPassword, confirmPassword} = req.body;
@@ -66,6 +72,20 @@ export const updatePassword = async (req: Request, res: Response, next: NextFunc
       return;
     }
 
+    
+
+    //check if password was changed in the last 24 hours
+    if(user.lastPasswordChange){
+      const lastChange = dayjs(user.lastPasswordChange);
+      const now = dayjs();
+      if(now.diff(lastChange, 'hour')<24){
+        res.status(429).json({//429 status means too many requests error
+          message:"Password can only be changed once every 24 hours",
+        });
+        return;
+      }
+    }
+
     console.log("Current password provided:", currentPassword);
     console.log("Current user password hash:", user.password);
 
@@ -78,6 +98,9 @@ export const updatePassword = async (req: Request, res: Response, next: NextFunc
     
     //update the password in the database
     await UserService.updateUserPassword(userId, newPassword);
+    
+    //update the lastPasswordChange timestamp
+    await UserService.updateLastPasswordChange(userId);
 
     //respond to the client
     res.status(200).json({ message: "Password updated successfully." });

@@ -18,12 +18,13 @@ export interface UserAttributes {
   password: string;
   address?: string | null;
   profilePicture?: string | null;
+  lastPasswordChange?: Date|null;
   createdAt?: Date;
   updatedAt?: Date;
 }
 
 // Define the optional fields for creating a new user
-export interface UserCreationAttributes extends Optional<UserAttributes, "user_id" | "createdAt" | "updatedAt"> {}
+export interface UserCreationAttributes extends Optional<UserAttributes, "user_id" |"lastPasswordChange" | "createdAt" | "updatedAt"> {}
 
 // Extend Sequelize's Model class
 export class User extends Model<UserAttributes, UserCreationAttributes> implements UserAttributes {
@@ -36,6 +37,7 @@ export class User extends Model<UserAttributes, UserCreationAttributes> implemen
   public password!: string;
   public address!: string | null;
   public profilePicture!: string|null;
+  public lastPasswordChange!: Date|null;
 
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
@@ -88,6 +90,10 @@ User.init(
     },
     address: {
       type: DataTypes.STRING,
+      allowNull: true,
+    },
+    lastPasswordChange: {
+      type:DataTypes.DATE,
       allowNull: true,
     },
     createdAt: {

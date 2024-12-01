@@ -66,5 +66,20 @@ export default class UserService {
     user.password = newPassword;//assign the hashwd password directly
     await user.save(); //save the changes
   }
+
+  
+  static async updateLastPasswordChange(userId:number){
+    const user = await User.findOne({
+      where:{
+        user_id:userId,
+      },
+    });
+
+    if(!user){
+      throw new Error(`User with ID ${userId} not found.`);
+    }
+    user.lastPasswordChange = new Date();
+    await user.save();
+  }
 }
 

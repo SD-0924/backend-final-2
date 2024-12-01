@@ -29,6 +29,7 @@ app.use('/api', productRoutes)
 app.use('/api/', merchantRoutes)
 app.use('/api', imageRouter)
 app.use('/api/wishlist', wishlistRoutes)
+app.use('/api', profileRoutes)
 // app.use('/api', authRouter)
 
 
