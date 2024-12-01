@@ -23,7 +23,7 @@ export class productCategoryService {
     page_number: number
   ) {
     const query = `
-    SELECT p.*, 
+    SELECT p.product_id, p.name, p.price, p.brand_name, p.discount_percentage, p.product_image_url, p.averageRating,p.NumberOfRatings,
            (SELECT COUNT(*) FROM product_category pc WHERE pc.category_id = :categoryId) AS totalCount
     FROM product p
     JOIN product_category pc ON p.product_id = pc.product_id
@@ -57,14 +57,6 @@ export class productCategoryService {
       }
       for (const product of products) {
         productService.addDiscountInfo(product);
-        await productService.addRatingInfo(product);
-        delete product[FIELD_NAMES.STOCK];
-        delete product[FIELD_NAMES.DESCRIPTION];
-        delete product[FIELD_NAMES.MERCHANT_ID];
-        delete product[FIELD_NAMES.BRAND_IMAGE_URL];
-        delete product[FIELD_NAMES.CREATED_AT];
-        delete product[FIELD_NAMES.UPDATED_AT];
-        delete product[FIELD_NAMES.TOTAL_COUNT];
       }
       result.products = products;
     }
