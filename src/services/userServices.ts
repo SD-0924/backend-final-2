@@ -45,13 +45,10 @@ export default class UserService {
         "dateOfBirth",
         "password",
         // "address",
-        // "profilePicture",
+         "profilePicture",
       ],
     });
 
-    // if(!user) {
-    //   throw new Error(`User with ID ${id} not found`);
-    // }
     return user;
   }
 
