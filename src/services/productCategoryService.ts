@@ -1,16 +1,21 @@
 // Import the constants
-import { FIELD_NAMES, PAGINATION } from '../constants'
+import { FIELD_NAMES, PAGINATION } from "../constants";
 
 // Import product service
-import { productService } from './productService'
+import { productService } from "./productService";
 
 // Import Sequelize instance
-import { sequelize } from '../config/db'
-import { QueryTypes } from 'sequelize'
-import { Category } from '../models/CategoryModel'
-import { Product } from '../models/ProductModel'
-import { Op } from 'sequelize'
-
+import { sequelize } from "../config/db";
+import { QueryTypes } from "sequelize";
+import { Category } from "../models/CategoryModel";
+import { Product } from "../models/ProductModel";
+import { Op } from "sequelize";
+export class Custom404Error extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "Custom404Error";
+  }
+}
 export class productCategoryService {
   // This function to get all products that belongs to category based on pagination
   static async getProductsBelongsToCategory(
@@ -24,7 +29,7 @@ export class productCategoryService {
     JOIN product_category pc ON p.product_id = pc.product_id
     WHERE pc.category_id = :categoryId
     LIMIT :limit OFFSET :offset;
-  `
+  `;
 
     const products: any = await sequelize.query(query, {
       replacements: {
@@ -33,8 +38,8 @@ export class productCategoryService {
         offset: (page_number - 1) * PAGINATION.DEFAULT_PAGE_SIZE,
       },
       type: QueryTypes.SELECT,
-    })
-    const result: any = {}
+    });
+    const result: any = {};
 
     if (products.length !== 0) {
       if (
@@ -43,41 +48,44 @@ export class productCategoryService {
       ) {
         result.number_of_pages = Math.floor(
           products[0][FIELD_NAMES.TOTAL_COUNT] / PAGINATION.DEFAULT_PAGE_SIZE
-        )
+        );
       } else {
         result.number_of_pages =
           Math.floor(
             products[0][FIELD_NAMES.TOTAL_COUNT] / PAGINATION.DEFAULT_PAGE_SIZE
-          ) + 1
+          ) + 1;
       }
       for (const product of products) {
-        productService.addDiscountInfo(product)
-        await productService.addRatingInfo(product)
-        delete product[FIELD_NAMES.STOCK]
-        delete product[FIELD_NAMES.DESCRIPTION]
-        delete product[FIELD_NAMES.MERCHANT_ID]
-        delete product[FIELD_NAMES.BRAND_IMAGE_URL]
-        delete product[FIELD_NAMES.CREATED_AT]
-        delete product[FIELD_NAMES.UPDATED_AT]
-        delete product[FIELD_NAMES.TOTAL_COUNT]
+        productService.addDiscountInfo(product);
+        await productService.addRatingInfo(product);
+        delete product[FIELD_NAMES.STOCK];
+        delete product[FIELD_NAMES.DESCRIPTION];
+        delete product[FIELD_NAMES.MERCHANT_ID];
+        delete product[FIELD_NAMES.BRAND_IMAGE_URL];
+        delete product[FIELD_NAMES.CREATED_AT];
+        delete product[FIELD_NAMES.UPDATED_AT];
+        delete product[FIELD_NAMES.TOTAL_COUNT];
       }
-      result.products = products
+      result.products = products;
     }
-    return result
+    return result;
   }
 
   static async handPickedService(category_id: number, page: number) {
-    const categoryProducts = Product.findAll({
+    const categoryProducts = await Product.findAndCountAll({
+      raw: true,
       where: {
         price: {
           [Op.lt]: 100,
         },
-        //TODO:Rating grater than or equals 4.5
+        averageRating: {
+          [Op.gte]: 4.5,
+        },
       },
       include: [
         {
           model: Category,
-          attributes: ['name'],
+          attributes: ["category_id", "name"],
           through: { attributes: [] },
           where: {
             category_id,
@@ -86,7 +94,20 @@ export class productCategoryService {
       ],
       limit: PAGINATION.DEFAULT_PAGE_SIZE,
       offset: (page - 1) * PAGINATION.DEFAULT_PAGE_SIZE,
-    })
-    return categoryProducts
+    });
+
+    const numberOfPages = Math.ceil(categoryProducts.count / 9);
+
+    if (numberOfPages < page) {
+      throw new Custom404Error("page not found");
+    }
+    for (const product of categoryProducts.rows) {
+      productService.addDiscountInfo(product);
+    }
+    return {
+      count: categoryProducts.count,
+      numberOfPages,
+      products: categoryProducts.rows,
+    };
   }
 }
