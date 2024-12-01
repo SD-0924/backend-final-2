@@ -7,7 +7,6 @@ import { DataTypes, Model, Optional } from "sequelize";
 // Import bcrypt from bcryptjs to encrypt password
 import bcrypt from "bcrypt";
 
-
 export interface UserAttributes {
   user_id: number;
   firstName: string;
@@ -23,10 +22,14 @@ export interface UserAttributes {
 }
 
 // Define the optional fields for creating a new user
-export interface UserCreationAttributes extends Optional<UserAttributes, "user_id" | "createdAt" | "updatedAt"> {}
+export interface UserCreationAttributes
+  extends Optional<UserAttributes, "user_id" | "createdAt" | "updatedAt"> {}
 
 // Extend Sequelize's Model class
-export class User extends Model<UserAttributes, UserCreationAttributes> implements UserAttributes {
+export class User
+  extends Model<UserAttributes, UserCreationAttributes>
+  implements UserAttributes
+{
   public user_id!: number;
   public firstName!: string;
   public lastName!: string;
@@ -35,7 +38,7 @@ export class User extends Model<UserAttributes, UserCreationAttributes> implemen
   public dateOfBirth!: Date | null;
   public password!: string;
   public address!: string | null;
-  public profilePicture!: string|null;
+  public profilePicture!: string | null;
 
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
@@ -84,7 +87,7 @@ User.init(
     },
     profilePicture: {
       type: DataTypes.STRING,
-      allowNull:true,
+      allowNull: true,
     },
     address: {
       type: DataTypes.STRING,
@@ -105,4 +108,3 @@ User.init(
     timestamps: true,
   }
 );
-
