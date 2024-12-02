@@ -5,6 +5,8 @@ import { CartItem } from "../models/CartItemModel";
 import { productService } from "../services/productService";
 import { orderService } from "../services/orderService";
 import { OrderItem } from "../models/OrderItem";
+import { orderItemService } from "../services/orderItemService";
+import { Sequelize } from "sequelize";
 
 export const checkoutHandler = async (
   req: Request,
@@ -44,11 +46,13 @@ export const checkoutHandler = async (
       //4-simulate payment
       const simulatePatment = simulatePayment(total);
       if (!simulatePatment) {
+        const order = await orderService.createOrder(user_id, total, 0);
+
         throw new Error("Patment Faild");
       }
       //5- update order , orderItem tables ans stock in product table
 
-      const order = await orderService.createOrder(user_id, 1);
+      const order = await orderService.createOrder(user_id, total, 1);
 
       const orderItems = productList.map((product) => ({
         quantity: product.dataValues.quantity,
@@ -66,10 +70,56 @@ export const checkoutHandler = async (
           "sub"
         );
       }
+
+      res.status(202).json({
+        order: productList,
+        total,
+      });
     });
   } catch (error) {
     res.status(500).json({
       message: error.message,
+    });
+  }
+};
+
+export const orderHistory = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { user_id } = req.body;
+    const orders = await orderService.getAllOrders(user_id);
+    res.status(200).json(orders);
+  } catch (error) {
+    res.status(500).json({
+      status: "error",
+      message: error.message,
+      details: error,
+    });
+  }
+};
+
+export const orderDetails = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const order_id = parseInt(req.params.order_id);
+    const { user_id } = req.body;
+
+    if (!order_id) throw new Error("no order id provided");
+
+    const orderItems = await productService.getOrderProducts(order_id);
+
+    res.status(200).json(orderItems);
+  } catch (error) {
+    res.status(500).json({
+      status: "error",
+      message: error.message,
+      details: error,
     });
   }
 };

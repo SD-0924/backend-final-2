@@ -14,8 +14,9 @@ import { categoryService } from "../services/categoryService";
 import { productCategoryService } from "../services/productCategoryService";
 
 // Import Sequelize and Op from sequelize module
-import { Op } from "sequelize";
+import { Op, Sequelize } from "sequelize";
 import { response } from "express";
+import { OrderItem } from "../models/OrderItem";
 
 export class productService {
   // This method to add discount information to product information
@@ -210,6 +211,27 @@ export class productService {
       } else {
         product.dataValues.stock += quantity;
       }
+    } catch (error) {
+      return { status: 500, response: error };
+    }
+  }
+
+  static async getOrderProducts(order_id: number) {
+    try {
+      const products = await Product.findAll({
+        include: [
+          {
+            model: OrderItem,
+            where: { order_id },
+            attributes: [
+              "quantity",
+              [Sequelize.literal("quantity*price"), "subtotal"],
+            ],
+          },
+        ],
+        attributes: ["price", "name", "brand_name"],
+      });
+      return products;
     } catch (error) {
       return { status: 500, response: error };
     }
