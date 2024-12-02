@@ -1,9 +1,9 @@
-import { sequelize } from '../config/db'
-import { DataTypes } from 'sequelize'
-import { User } from './UserModel'
-import { OrderItem } from './OrderItem'
+import { sequelize } from "../config/db";
+import { DataTypes } from "sequelize";
+import { User } from "./UserModel";
+import { OrderItem } from "./OrderItem";
 export const Order = sequelize.define(
-  'Order',
+  "Order",
   {
     order_id: {
       type: DataTypes.INTEGER,
@@ -18,19 +18,23 @@ export const Order = sequelize.define(
       type: DataTypes.INTEGER,
       references: {
         model: User,
-        key: 'user_id',
+        key: "user_id",
       },
     },
     orderItem_id: {
       type: DataTypes.INTEGER,
       references: {
         model: OrderItem,
-        key: 'orderItem_id',
+        key: "orderItem_id",
       },
+    },
+    total: {
+      type: DataTypes.FLOAT,
+      allowNull: false,
     },
   },
   {
-    tableName: 'order',
+    tableName: "order",
     timestamps: true,
   }
-)
+);
