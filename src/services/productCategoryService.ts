@@ -63,6 +63,33 @@ export class productCategoryService {
     return result;
   }
 
+  // This function to get all products that are related to specific product
+  static async getProductsRelatedToProduct(
+    category_id: number,
+    product_id: number
+  ) {
+    const query = `
+    SELECT p.product_id, p.name, p.price, p.brand_name, p.discount_percentage, p.product_image_url, p.averageRating,p.NumberOfRatings
+    FROM product p
+    JOIN product_category pc ON p.product_id = pc.product_id
+    WHERE pc.category_id = :categoryId AND pc.product_id != :productId
+    LIMIT :limit;
+  `;
+
+    const products: any = await sequelize.query(query, {
+      replacements: {
+        categoryId: category_id,
+        productId: product_id,
+        limit: PAGINATION.RELATED_PRODUCT_PAGE_SIZE,
+      },
+      type: QueryTypes.SELECT,
+    });
+    for (const product of products) {
+      productService.addDiscountInfo(product);
+    }
+    return products;
+  }
+
   static async handPickedService(category_id: number, page: number) {
     const categoryProducts = await Product.findAndCountAll({
       raw: true,

@@ -1,42 +1,39 @@
 // Import the constants
-import { CONSTANTS, FIELD_NAMES, RATING } from '../constants'
+import { CONSTANTS } from "../constants";
 
 // Import product model
-import { Product } from '../models/ProductModel'
-
-// Import rating service
-import { ratingService } from '../services/ratingService'
+import { Product } from "../models/ProductModel";
 
 // Import category service
-import { categoryService } from '../services/categoryService'
+import { categoryService } from "../services/categoryService";
 
 // Import productCategory service
-import { productCategoryService } from '../services/productCategoryService'
+import { productCategoryService } from "../services/productCategoryService";
 
 // Import Sequelize and Op from sequelize module
-import { Op } from 'sequelize'
+import { Op } from "sequelize";
 
 export class productService {
   // This method to add discount information to product information
   static addDiscountInfo(productInfo: any) {
     if (productInfo.discount_percentage === CONSTANTS.DISCOUNT_ZERO) {
-      productInfo.price_after_discount = null
-      return
+      productInfo.price_after_discount = null;
+      return;
     }
     const discountValue =
-      productInfo.price * (productInfo.discount_percentage / 100)
-    productInfo.price_after_discount = productInfo.price - discountValue
+      productInfo.price * (productInfo.discount_percentage / 100);
+    productInfo.price_after_discount = productInfo.price - discountValue;
     productInfo.price_after_discount = parseFloat(
       productInfo.price_after_discount.toFixed(CONSTANTS.DISCOUNT_PRECISION)
-    )
+    );
   }
   // Method to retrieve new arrival products
   static async getNewArrivalsProducts() {
-    const currentDate = new Date()
+    const currentDate = new Date();
 
     // Calculate the start date of the previous three months
-    const threeMonthsAgo = new Date()
-    threeMonthsAgo.setMonth(currentDate.getMonth() - 3)
+    const threeMonthsAgo = new Date();
+    threeMonthsAgo.setMonth(currentDate.getMonth() - 3);
 
     try {
       // Fetch products created within the last three months
@@ -48,24 +45,24 @@ export class productService {
         },
         raw: true,
         attributes: [
-          'product_id',
-          'name',
-          'price',
-          'brand_name',
-          'discount_percentage',
-          'product_image_url',
+          "product_id",
+          "name",
+          "price",
+          "brand_name",
+          "discount_percentage",
+          "product_image_url",
         ],
-      })
+      });
 
       // Process products and clean up fields
       newProducts.forEach((product) => {
-        this.addDiscountInfo(product) // Add discount info
-      })
+        this.addDiscountInfo(product); // Add discount info
+      });
 
-      return newProducts
+      return newProducts;
     } catch (error) {
-      console.error('Error fetching new arrivals:', error)
-      throw new Error('Failed to fetch new arrival products.')
+      console.error("Error fetching new arrivals:", error);
+      throw new Error("Failed to fetch new arrival products.");
     }
   }
   // This method to get all products that matched user search
@@ -86,44 +83,44 @@ export class productService {
         ],
       },
       attributes: [
-        'product_id',
-        'name',
-        'price',
-        'brand_name',
-        'discount_percentage',
-        'product_image_url',
-        'averageRating',
-        'NumberOfRatings',
+        "product_id",
+        "name",
+        "price",
+        "brand_name",
+        "discount_percentage",
+        "product_image_url",
+        "averageRating",
+        "NumberOfRatings",
       ],
       raw: true,
-    })
+    });
     for (const product of products) {
-      this.addDiscountInfo(product)
+      this.addDiscountInfo(product);
     }
-    return products
+    return products;
   }
   // This method to get a specific product based on id
   static async findProductById(product_id: number) {
     const product: any = await Product.findByPk(product_id, {
       raw: true,
       attributes: [
-        'product_id',
-        'name',
-        'description',
-        'price',
-        'stock',
-        'brand_name',
-        'discount_percentage',
-        'product_image_url',
-        'averageRating',
-        'NumberOfRatings',
+        "product_id",
+        "name",
+        "description",
+        "price",
+        "stock",
+        "brand_name",
+        "discount_percentage",
+        "product_image_url",
+        "averageRating",
+        "NumberOfRatings",
       ],
-    })
+    });
     if (product === null) {
-      return {}
+      return {};
     }
-    this.addDiscountInfo(product)
-    return product
+    this.addDiscountInfo(product);
+    return product;
   }
   // This method to get all products that belongs to category
   static async findProductsByCategory(
@@ -131,26 +128,40 @@ export class productService {
     pageNumber: number
   ) {
     const categoryInfo: any =
-      await categoryService.getCategoryByName(categoryName)
+      await categoryService.getCategoryByName(categoryName);
     if (!categoryInfo) {
-      return {}
+      return {};
     }
     const products: any =
       await productCategoryService.getProductsBelongsToCategory(
         categoryInfo.category_id,
         pageNumber
-      )
-    return products
+      );
+    return products;
+  }
+  // This method to get products that related to specific product
+  static async getRelatedProducts(categoryName: string, product_id: number) {
+    const categoryInfo: any =
+      await categoryService.getCategoryByName(categoryName);
+    if (!categoryInfo) {
+      return [];
+    }
+    const products: any =
+      await productCategoryService.getProductsRelatedToProduct(
+        categoryInfo.category_id,
+        product_id
+      );
+    return products;
   }
 
   // This method to get all brands
   static async getBrandsService() {
     const brands = await Product.findAll({
-      attributes: ['brand_image_url', 'brand_name'],
-      group: ['brand_name', 'brand_image_url'],
-    })
-    console.log(brands)
-    return brands.map((e) => e.dataValues)
+      attributes: ["brand_image_url", "brand_name"],
+      group: ["brand_name", "brand_image_url"],
+    });
+    console.log(brands);
+    return brands.map((e) => e.dataValues);
   }
 }
 
@@ -160,21 +171,21 @@ export const getProductByBrand = async (brand: string) => {
       where: {
         brand_name: brand,
       },
-    })
+    });
     if (products.length === 0) {
-      return { status: 404, response: 'No products found' }
+      return { status: 404, response: "No products found" };
     }
-    return { status: 200, response: products }
+    return { status: 200, response: products };
   } catch (error) {
-    return { status: 500, response: error }
+    return { status: 500, response: error };
   }
-}
+};
 
 export const createProduct = async (product: any) => {
   try {
-    const newProduct = await Product.create(product)
-    return { status: 201, response: newProduct }
+    const newProduct = await Product.create(product);
+    return { status: 201, response: newProduct };
   } catch (error) {
-    return { status: 500, response: error }
+    return { status: 500, response: error };
   }
-}
+};
