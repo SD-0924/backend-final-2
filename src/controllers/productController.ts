@@ -81,6 +81,15 @@ export const createProductController = async (req: Request, res: Response) => {
 };
 
 // Retrieve all new arrivals products
+export const getAllNewArrivalsProducts = async (
+  req: Request,
+  res: Response
+): Promise<any> => {
+  const products = await productService.getAllNewArrivalsProducts();
+  res.status(200).json(products);
+};
+
+// Retrieve only 4 new arrivals products
 export const getNewArrivalsProducts = async (
   req: Request,
   res: Response
@@ -88,6 +97,7 @@ export const getNewArrivalsProducts = async (
   const products = await productService.getNewArrivalsProducts();
   res.status(200).json(products);
 };
+
 
 // Retrieve all products where either the product brand or the product name contains the keyword entered by the user
 export const findProductsByText = async (
