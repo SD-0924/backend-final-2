@@ -142,6 +142,27 @@ export const findProductsByCategory = async (
   res.status(200).json(products);
 };
 
+// Retrieve related products for specfic product
+export const getRelatedProducts = async (
+  req: Request,
+  res: Response
+): Promise<any> => {
+  // Validate product id using Joi
+  const { error: err } = productIdSchema.validate(req.params.productId);
+  if (err) {
+    return res.status(400).json({
+      message: "product id should be positive integer number",
+    });
+  }
+  const product_id = Number(req.params.productId);
+  const categoryName = req.params.category;
+  const products = await productService.getRelatedProducts(
+    categoryName,
+    product_id
+  );
+  res.status(200).json(products);
+};
+
 //Retrieve brands list
 export const getBrands = async (req: Request, res: Response): Promise<any> => {
   try {

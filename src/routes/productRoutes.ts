@@ -18,6 +18,12 @@ productRoutes.get(
   productController.findProductsByCategory
 );
 
+// Route for get products that related to specific product
+productRoutes.get(
+  "/products/:category/:productId",
+  productController.getRelatedProducts
+);
+
 // Route for brands
 productRoutes.get("/brands", productController.getBrands);
 
