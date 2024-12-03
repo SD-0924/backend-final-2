@@ -27,83 +27,51 @@ export class productService {
       productInfo.price_after_discount.toFixed(CONSTANTS.DISCOUNT_PRECISION)
     );
   }
-  // Method to retrieve new all arrival products
-  static async getAllNewArrivalsProducts() {
-    const currentDate = new Date();
-
-    // Calculate the start date of the previous three months
-    const threeMonthsAgo = new Date();
-    threeMonthsAgo.setMonth(currentDate.getMonth() - 3);
-
-    try {
-      // Fetch products created within the last three months
-      const newProducts: any[] = await Product.findAll({
-        where: {
-          createdAt: {
-            [Op.between]: [threeMonthsAgo, currentDate],
-          },
+ // Method to retrieve new arrival products with optional limit
+static async getNewArrivalsProducts(limit?: number) {
+  const currentDate = new Date();
+  
+  // Calculate the start date of the previous three months
+  const threeMonthsAgo = new Date();
+  threeMonthsAgo.setMonth(currentDate.getMonth() - 3);
+  
+  try {
+    // Fetch products created within the last three months
+    const queryOptions: any = {
+      where: {
+        createdAt: {
+          [Op.between]: [threeMonthsAgo, currentDate],
         },
-        raw: true,
-        attributes: [
-          "product_id",
-          "name",
-          "price",
-          "brand_name",
-          "discount_percentage",
-          "product_image_url",
-        ],
-      });
-
-      // Process products and clean up fields
-      newProducts.forEach((product) => {
-        this.addDiscountInfo(product); // Add discount info
-      });
-
-      return newProducts;
-    } catch (error) {
-      console.error("Error fetching new arrivals:", error);
-      throw new Error("Failed to fetch new arrival products.");
+      },
+      raw: true,
+      attributes: [
+        "product_id",
+        "name", 
+        "price",
+        "brand_name",
+        "discount_percentage",
+        "product_image_url",
+      ],
+    };
+    
+    // Add limit if provided
+    if (limit !== undefined) {
+      queryOptions.limit = limit;
     }
+    
+    // Fetch products
+    const newProducts: any[] = await Product.findAll(queryOptions);
+    
+    // Process products and clean up fields
+    newProducts.forEach((product) => {
+      this.addDiscountInfo(product); // Add discount info
+    });
+    
+    return newProducts;
+  } catch (error) {
+    console.error("Error fetching new arrivals:", error);
+    throw new Error("Failed to fetch new arrival products.");
   }
-
-  // Method to retrieve only 4 new arrival products
-  static async getNewArrivalsProducts() {
-    const currentDate = new Date();
-
-    // Calculate the start date of the previous three months
-    const threeMonthsAgo = new Date();
-    threeMonthsAgo.setMonth(currentDate.getMonth() - 3);
-
-    try {
-        // Fetch products created within the last three months, limited to 4
-        const newProducts: any[] = await Product.findAll({
-            where: {
-                createdAt: {
-                    [Op.between]: [threeMonthsAgo, currentDate],
-                },
-            },
-            raw: true,
-            attributes: [
-                "product_id",
-                "name",
-                "price",
-                "brand_name",
-                "discount_percentage",
-                "product_image_url",
-            ],
-            limit: 4, // Limit to 4 products
-        });
-
-        // Process products and clean up fields
-        newProducts.forEach((product) => {
-            this.addDiscountInfo(product); // Add discount info
-        });
-
-        return newProducts;
-    } catch (error) {
-        console.error("Error fetching new arrivals:", error);
-        throw new Error("Failed to fetch new arrival products.");
-    }
 }
 
   // This method to get all products that matched user search
