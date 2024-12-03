@@ -85,7 +85,7 @@ export const getAllNewArrivalsProducts = async (
   req: Request,
   res: Response
 ): Promise<any> => {
-  const products = await productService.getAllNewArrivalsProducts();
+  const products = await productService.getNewArrivalsProducts();
   res.status(200).json(products);
 };
 
@@ -94,7 +94,7 @@ export const getNewArrivalsProducts = async (
   req: Request,
   res: Response
 ): Promise<any> => {
-  const products = await productService.getNewArrivalsProducts();
+  const products = await productService.getNewArrivalsProducts(4);
   res.status(200).json(products);
 };
 
