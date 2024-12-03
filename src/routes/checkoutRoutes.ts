@@ -4,6 +4,7 @@ import {
   orderDetails,
   orderHistory,
 } from "../controllers/checkoutController";
+import { verifyToken } from "../utils/verifyToken";
 
 export const checkoutRoutes = express.Router();
 

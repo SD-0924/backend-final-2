@@ -6,7 +6,7 @@ import { productService } from "../services/productService";
 import { orderService } from "../services/orderService";
 import { OrderItem } from "../models/OrderItem";
 import { orderItemService } from "../services/orderItemService";
-import { Sequelize } from "sequelize";
+import { Sequelize, Transaction } from "sequelize";
 
 export const checkoutHandler = async (
   req: Request,
@@ -15,71 +15,84 @@ export const checkoutHandler = async (
 ) => {
   try {
     const result = await sequelize.transaction(async (t: any) => {
-      const { user_id } = req.body;
-      //1- fetch cart data
-      const productList = await Product.findAll({
-        include: [
-          {
-            model: CartItem,
-            where: { user_id },
-            attributes: ["quantity"],
-          },
-        ],
-      });
-      //2- check stock
-      for (const product of productList) {
-        const isAvaiable = await productService.checkStock(
-          product.dataValues.product_id,
-          product.dataValues.quantity
-        );
-        if (!isAvaiable) {
-          throw new Error(
-            `Insufficient stock for product ID ${product.dataValues.product_id}`
+      try {
+        const { user_id } = req.body;
+        //1- fetch cart data
+        const productList = await Product.findAll({
+          include: [
+            {
+              model: CartItem,
+              where: { user_id },
+              attributes: ["quantity"],
+            },
+          ],
+        });
+        console.log(productList[0].dataValues.CartItems);
+        //2- check stock
+        for (const product of productList) {
+          const isAvaiable = await productService.checkStock(
+            product.dataValues.product_id,
+            product.dataValues.CartItems[0].dataValues.quantity
+          );
+
+          if (!isAvaiable) {
+            throw new Error(
+              `Insufficient stock for product ID ${product.dataValues.product_id}`
+            );
+          }
+        }
+        //3- calculate total
+        const total = productList.reduce((sum, product) => {
+          return (
+            sum +
+            product.dataValues.price *
+              product.dataValues.CartItems[0].dataValues.quantity
+          );
+        }, 0);
+
+        //4-simulate payment
+        const simulatePatment = simulatePayment(total);
+        if (!simulatePatment) {
+          const order = await orderService.createOrder(user_id, total, 0);
+
+          throw new Error("Patment Faild");
+        }
+        //5- update order , orderItem tables ans stock in product table
+
+        const order = await orderService.createOrder(user_id, total, 1);
+
+        const orderItems = productList.map((product) => ({
+          quantity: product.dataValues.CartItems[0].dataValues.quantity,
+          user_id,
+          product_id: product.dataValues.product_id,
+          order_id: order.dataValues.order_id,
+        }));
+
+        await OrderItem.bulkCreate(orderItems);
+
+        //update the stock
+        for (const product of productList) {
+          await productService.updateStock(
+            product.dataValues.product_id,
+            product.dataValues.CartItems[0].dataValues.quantity,
+            "sub"
           );
         }
+        await t.commit();
+
+        res.status(202).json({
+          order: productList,
+          total,
+        });
+      } catch (error) {
+        await t.rollback();
+        res.status(400).json({
+          message: error.message,
+        });
       }
-      //3- calculate total
-      const total = productList.reduce((sum, product) => {
-        return sum + product.dataValues.price * product.dataValues.quantity;
-      }, 0);
-
-      //4-simulate payment
-      const simulatePatment = simulatePayment(total);
-      if (!simulatePatment) {
-        const order = await orderService.createOrder(user_id, total, 0);
-
-        throw new Error("Patment Faild");
-      }
-      //5- update order , orderItem tables ans stock in product table
-
-      const order = await orderService.createOrder(user_id, total, 1);
-
-      const orderItems = productList.map((product) => ({
-        quantity: product.dataValues.quantity,
-        user_id,
-        product_id: product.dataValues.product_id,
-      }));
-
-      await OrderItem.bulkCreate(orderItems);
-
-      //update the stock
-      for (const product of productList) {
-        await productService.updateStock(
-          product.dataValues.product_id,
-          product.dataValues.quantity,
-          "sub"
-        );
-      }
-
-      res.status(202).json({
-        order: productList,
-        total,
-      });
     });
   } catch (error) {
-    res.status(500).json({
-      message: error.message,
-    });
+    console.log(error.message);
   }
 };
 

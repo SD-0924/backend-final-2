@@ -94,10 +94,9 @@ export const getNewArrivalsProducts = async (
   req: Request,
   res: Response
 ): Promise<any> => {
-  const products = await productService.getNewArrivalsProducts(4);
+  const products = await productService.getNewArrivalsProducts();
   res.status(200).json(products);
 };
-
 
 // Retrieve all products where either the product brand or the product name contains the keyword entered by the user
 export const findProductsByText = async (

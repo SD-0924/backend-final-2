@@ -21,13 +21,7 @@ export const Order = sequelize.define(
         key: "user_id",
       },
     },
-    orderItem_id: {
-      type: DataTypes.INTEGER,
-      references: {
-        model: OrderItem,
-        key: "orderItem_id",
-      },
-    },
+
     total: {
       type: DataTypes.FLOAT,
       allowNull: false,

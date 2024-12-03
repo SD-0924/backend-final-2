@@ -165,7 +165,20 @@ export class productService {
       );
     return products;
   }
-
+  // This method to get products that related to specific product
+  static async getRelatedProducts(categoryName: string, product_id: number) {
+    const categoryInfo: any =
+      await categoryService.getCategoryByName(categoryName);
+    if (!categoryInfo) {
+      return [];
+    }
+    const products: any =
+      await productCategoryService.getProductsRelatedToProduct(
+        categoryInfo.category_id,
+        product_id
+      );
+    return products;
+  }
   // This method to get all brands
   static async getBrandsService() {
     const brands = await Product.findAll({
@@ -186,8 +199,8 @@ export class productService {
     if (!product) {
       throw new Error("Product not found");
     }
-
-    if (product.dataValues.stock >= quantity) return true;
+    console.log(product.dataValues.stock, "quantity: " + quantity);
+    if (0 >= quantity) return true;
 
     return false;
   }
