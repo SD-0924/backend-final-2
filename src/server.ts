@@ -6,15 +6,11 @@ import { setupAssociations } from "./models/associations";
 import { productRoutes } from "./routes/productRoutes";
 import merchantRoutes from "./routes/merchantRoutes";
 import { invalidRoute, invalidJSON } from "./middleware/errorHandler";
-import { signUp } from "./controllers/authController";
-
-import authRoutes from "./routes/authRoutes";
 import profileRoutes from "./routes/profileRoutes"
-
-import { imageRouter } from "./routes/uploadImageRoutes";
-import wishlistRoutes from "./routes/wishlistRoutes";
-
-
+import { imageRouter } from './routes/uploadImageRoutes'
+import wishlistRoutes from './routes/wishlistRoutes'
+import authRouter from './routes/authRoutes'
+import cartRoutes from './routes/cartRoutes';
 
 dotenv.config();
 
@@ -31,7 +27,8 @@ app.use("/api/", merchantRoutes);
 app.use("/api", imageRouter);
 app.use("/api/wishlist", wishlistRoutes);
 app.use('/api/user', profileRoutes)
-// app.use("/api", authRouter);
+app.use('/api', authRouter)
+app.use('/api/cart', cartRoutes)
 
 // Middleware to handle invalid routes
 app.use(invalidRoute);
