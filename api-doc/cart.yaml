@@ -1,5 +1,5 @@
 paths:
-  /cart:
+  /api/cart:
     post:
       tags:
         - Cart
@@ -60,7 +60,7 @@ paths:
                     example: Invalid input. userId, productId, and quantity must be valid numbers.
         '500':
           description: Internal server error.
-  /cart/{userId}:
+  /api/cart/{userId}:
     get:
       tags:
         - Cart
@@ -106,7 +106,7 @@ paths:
           description: Invalid userId.
         '500':
           description: Error fetching cart items.
-  /cart/{cartItemId}:
+  /api/cart/{cartItemId}:
     put:
       tags:
         - Cart
