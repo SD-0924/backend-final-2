@@ -7,8 +7,8 @@ import {
 
 export const ratingRouter = express.Router();
 
-ratingRouter.post("/rating", addRating);
-ratingRouter.put("/rating", updateRating);
+ratingRouter.post("/", addRating);
+ratingRouter.put("/", updateRating);
 
 // This route retrieves all ratings and reviews for a specific product
 ratingRouter.get("/productRating/:productId", retrieveProductRatingsAndReviews);
