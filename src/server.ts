@@ -6,29 +6,33 @@ import { setupAssociations } from "./models/associations";
 import { productRoutes } from "./routes/productRoutes";
 import merchantRoutes from "./routes/merchantRoutes";
 import { invalidRoute, invalidJSON } from "./middleware/errorHandler";
-import profileRoutes from "./routes/profileRoutes"
-import { imageRouter } from './routes/uploadImageRoutes'
-import wishlistRoutes from './routes/wishlistRoutes'
-import authRouter from './routes/authRoutes'
-import cartRoutes from './routes/cartRoutes';
+import profileRoutes from "./routes/profileRoutes";
+import { imageRouter } from "./routes/uploadImageRoutes";
+import wishlistRoutes from "./routes/wishlistRoutes";
+import authRouter from "./routes/authRoutes";
+import cartRoutes from "./routes/cartRoutes";
+import { signUp } from "./controllers/authController";
+import { ratingRouter } from "./routes/ratingRoutes";
+import authRoutes from "./routes/authRoutes";
 
 dotenv.config();
 
 // dotenv.configDotenv();
 
-
 export const app = express();
 app.use(express.json());
 const PORT = Number(process.env.PORT) || 3000;
 
-
 app.use("/api", productRoutes);
 app.use("/api/", merchantRoutes);
 app.use("/api", imageRouter);
+app.use("/api", ratingRouter);
 app.use("/api/wishlist", wishlistRoutes);
-app.use('/api/user', profileRoutes)
-app.use('/api', authRouter)
-app.use('/api/cart', cartRoutes)
+app.use("/api/user", profileRoutes);
+app.use("/api", authRouter);
+app.use("/api/cart", cartRoutes);
+app.use("/api/user", profileRoutes);
+// app.use("/api", authRouter);
 
 // Middleware to handle invalid routes
 app.use(invalidRoute);
