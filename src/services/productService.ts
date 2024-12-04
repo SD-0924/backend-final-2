@@ -126,7 +126,7 @@ static async getNewArrivalsProducts(limit?: number) {
       ],
     });
     if (product === null) {
-      return {};
+      return null;
     }
     this.addDiscountInfo(product);
     return product;
