@@ -14,6 +14,7 @@ import profileRoutes from "./routes/profileRoutes"
 import { imageRouter } from "./routes/uploadImageRoutes";
 import wishlistRoutes from "./routes/wishlistRoutes";
 import cartRouter from "./routes/cartRoutes";
+import { ratingRouter } from "./routes/ratingRoutes";
 
 
 import swaggerUi from "swagger-ui-express";
@@ -37,6 +38,7 @@ app.use("/api/wishlist", wishlistRoutes);
 app.use('/api/user', profileRoutes)
 app.use("/api", authRoutes);
 app.use('/api/cart', cartRouter);
+app.use('/api/rating', ratingRouter)
 
 // Middleware to handle invalid routes
 app.use(invalidRoute);

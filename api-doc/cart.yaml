@@ -1,0 +1,185 @@
+paths:
+  /cart:
+    post:
+      tags:
+        - Cart
+      summary: Add an item to the cart
+      description: Adds a new item to the cart after validating input and stock availability.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: integer
+                  example: 1
+                  description: ID of the user adding the item.
+                productId:
+                  type: integer
+                  example: 5
+                  description: ID of the product being added to the cart.
+                quantity:
+                  type: integer
+                  example: 2
+                  description: Quantity of the product to be added.
+              required:
+                - userId
+                - productId
+                - quantity
+      responses:
+        '201':
+          description: Cart item successfully added.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  cartItem_id:
+                    type: integer
+                    example: 1
+                  user_id:
+                    type: integer
+                    example: 1
+                  product_id:
+                    type: integer
+                    example: 5
+                  quantity:
+                    type: integer
+                    example: 2
+        '400':
+          description: Invalid input data.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Invalid input. userId, productId, and quantity must be valid numbers.
+        '500':
+          description: Internal server error.
+  /cart/{userId}:
+    get:
+      tags:
+        - Cart
+      summary: Get all items in a user's cart
+      description: Retrieves all items in the cart for the given user.
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: integer
+          description: ID of the user whose cart items are to be fetched.
+          example: 1
+      responses:
+        '200':
+          description: Successfully fetched the cart items.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    cartItem_id:
+                      type: integer
+                      example: 1
+                    product_id:
+                      type: integer
+                      example: 5
+                    quantity:
+                      type: integer
+                      example: 2
+                    productDetails:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                          example: Laptop
+                        stock:
+                          type: integer
+                          example: 10
+        '400':
+          description: Invalid userId.
+        '500':
+          description: Error fetching cart items.
+  /cart/{cartItemId}:
+    put:
+      tags:
+        - Cart
+      summary: Update the quantity of a cart item
+      description: Updates the quantity of an existing cart item.
+      parameters:
+        - in: path
+          name: cartItemId
+          required: true
+          schema:
+            type: integer
+          description: ID of the cart item to update.
+          example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                newQuantity:
+                  type: integer
+                  example: 3
+                  description: New quantity for the cart item.
+              required:
+                - newQuantity
+      responses:
+        '200':
+          description: Cart item quantity successfully updated.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  cartItem_id:
+                    type: integer
+                    example: 1
+                  quantity:
+                    type: integer
+                    example: 3
+        '400':
+          description: Invalid input data.
+        '404':
+          description: Cart item not found.
+        '500':
+          description: Internal server error.
+    delete:
+      tags:
+        - Cart
+      summary: Remove a cart item
+      description: Deletes a cart item by its ID.
+      parameters:
+        - in: path
+          name: cartItemId
+          required: true
+          schema:
+            type: integer
+          description: ID of the cart item to be deleted.
+          example: 1
+      responses:
+        '200':
+          description: Cart item successfully deleted.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Cart item deleted successfully.
+        '400':
+          description: Invalid cartItemId.
+        '404':
+          description: Cart item not found.
+        '500':
+          description: Internal server error.
