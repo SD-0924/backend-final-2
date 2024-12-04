@@ -33,7 +33,7 @@ app.use("/api/", merchantRoutes);
 app.use("/api", imageRouter);
 app.use("/api/wishlist", wishlistRoutes);
 app.use('/api/user', profileRoutes)
-// app.use("/api", authRouter);
+app.use("/api", authRoutes);
 
 // Middleware to handle invalid routes
 app.use(invalidRoute);
