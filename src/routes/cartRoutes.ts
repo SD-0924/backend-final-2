@@ -1,18 +1,18 @@
 import { Router } from 'express'
 import cartController from '../controllers/cartController'
 
-const router = Router()
+const cartRouter = Router()
 
 // Route to add an item to the cart
-router.post('/', cartController.addItemToCart)
+cartRouter.post('/', cartController.addItemToCart)
 
 // Route to get all cart items for a user
-router.get('/:userId', cartController.getUserCart)
+cartRouter.get('/:userId', cartController.getUserCart)
 
 // Route to update the quantity of a cart item
-router.put('/:cartItemId', cartController.updateCartItem)
+cartRouter.put('/:cartItemId', cartController.updateCartItem)
 
 // Route to remove a cart item by cartItemId
-router.delete('/:cartItemId', cartController.removeCartItem)
+cartRouter.delete('/:cartItemId', cartController.removeCartItem)
 
-export default router
+export default cartRouter
