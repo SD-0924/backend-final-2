@@ -46,7 +46,7 @@ export default class UserService {
         "password",
         // "address",
         "profilePicture",
-        // "lastPasswordChange",
+        "lastPasswordChange",
       ],
     });
 
@@ -67,10 +67,10 @@ export default class UserService {
     user.password = newPassword;//assign the hashwd password directly
 
     console.log("Updating lastPasswordChange to:", new Date());
-    // user.lastPasswordChange = new Date();
+    user.lastPasswordChange = new Date();
     await user.save(); //save the changes
     console.log("Updated user after password change:", user);
-   // console.log("Updated lastPasswordChange:", user.lastPasswordChange); // Log for verification
+   console.log("Updated lastPasswordChange:", user.lastPasswordChange); // Log for verification
 
   }
 
