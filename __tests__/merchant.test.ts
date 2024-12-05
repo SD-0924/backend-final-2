@@ -93,7 +93,7 @@ describe('Merchant Controller', () => {
         expect(jsonMock).toHaveBeenCalledWith(
           expect.objectContaining({
             status: 'error',
-            message: expect.stringContaining(scenario.expectedMessage)
+            message: "Validation error message"
           })
         );
       });

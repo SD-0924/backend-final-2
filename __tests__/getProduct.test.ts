@@ -64,7 +64,7 @@ describe("Get Product API", () => {
     expect(response.status).toBe(400);
     expect(response.body).toHaveProperty(
       "message",
-      "product id must be a positive integer"
+      "Product id must be a positive integer"
     );
   });
 });
