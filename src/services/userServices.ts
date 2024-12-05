@@ -70,7 +70,7 @@ export default class UserService {
     user.lastPasswordChange = new Date();
     await user.save(); //save the changes
     console.log("Updated user after password change:", user);
-    console.log("Updated lastPasswordChange:", user.lastPasswordChange); // Log for verification
+   console.log("Updated lastPasswordChange:", user.lastPasswordChange); // Log for verification
 
   }
 

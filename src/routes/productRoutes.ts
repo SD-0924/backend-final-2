@@ -22,7 +22,7 @@ productRoutes.get(
   productController.findProductsByCategory
 );
 
-// Route for get products that related to specific product
+// Route for get products that are related to a specific product
 productRoutes.get(
   "/products/:category/:productId",
   productController.getRelatedProducts

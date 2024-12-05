@@ -1,0 +1,168 @@
+paths:
+  /api/wishlist:
+    post:
+      tags:
+        - Wishlist
+      summary: Create a new wishlist item
+      description: Adds a product to a user's wishlist
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - userId
+                - productId
+              properties:
+                userId:
+                  type: integer
+                  description: Unique identifier of the user
+                productId:
+                  type: integer
+                  description: Unique identifier of the product to be added to wishlist
+      responses:
+        '201':
+          description: Wishlist item created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  wishlist_Id:
+                    type: integer
+                  user_id:
+                    type: integer
+                  product_id:
+                    type: integer
+        '400':
+          description: Invalid input parameters
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Invalid userId or productId. They must be valid numbers."
+        '500':
+          description: Server error while creating wishlist item
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Error creating wishlist item."
+                  error:
+                    type: object
+
+  '/api/wishlist/{userId}':
+    get:
+      tags:
+        - Wishlist
+      summary: Retrieve all wishlist items for a user
+      description: Fetches all products in a user's wishlist
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: integer
+          description: Unique identifier of the user
+      responses:
+        '200':
+          description: Successfully retrieved wishlist items
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    wishlist_Id:
+                      type: integer
+                    user_id:
+                      type: integer
+                    product_id:
+                      type: integer
+        '400':
+          description: Invalid user ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Invalid userId. It must be a valid number."
+        '500':
+          description: Server error while fetching wishlist items
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Error fetching wishlist items."
+                  error:
+                    type: object
+
+  '/api/wishlist/{wishlistId}':
+    delete:
+      tags:
+        - Wishlist
+      summary: Delete a specific wishlist item
+      description: Removes a single item from a user's wishlist
+      parameters:
+        - in: path
+          name: wishlistId
+          required: true
+          schema:
+            type: integer
+          description: Unique identifier of the wishlist item to delete
+      responses:
+        '200':
+          description: Wishlist item deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Wishlist item deleted successfully."
+        '400':
+          description: Invalid wishlist ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Invalid wishlistId. It must be a valid number."
+        '404':
+          description: Wishlist item not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Wishlist item not found."
+        '500':
+          description: Server error while deleting wishlist item
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Error deleting wishlist item."
+                  error:
+                    type: object

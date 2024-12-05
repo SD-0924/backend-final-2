@@ -1,0 +1,6 @@
+tags:
+  - name: Merchant
+    description: APIs related to merchant management
+  
+  - name: Product
+    description: APIs related to product management

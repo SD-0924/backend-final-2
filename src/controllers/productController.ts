@@ -119,10 +119,13 @@ export const findProductById = async (
   if (err) {
     return res
       .status(400)
-      .json({ message: "product id must be a positive integer" });
+      .json({ message: "Product id must be a positive integer" });
   }
   const productID = Number(req.params.id);
   const product = await productService.findProductById(productID);
+  if (product === null) {
+    return res.status(404).json({ message: "Product not found" });
+  }
   res.status(200).json(product);
 };
 
@@ -133,14 +136,14 @@ export const findProductsByCategory = async (
 ): Promise<any> => {
   if (req.query.page === undefined) {
     return res.status(400).json({
-      message: "you should provide a page number in URL as query params",
+      message: "You should provide a page number in URL as query params",
     });
   }
   // Validate page number using Joi
   const { error: err } = productIdSchema.validate(req.query.page);
   if (err) {
     return res.status(400).json({
-      message: "page number should be positive integer number",
+      message: "Page number should be positive integer number",
     });
   }
   const pageNumber = Number(req.query.page);

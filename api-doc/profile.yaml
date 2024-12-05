@@ -1,0 +1,160 @@
+openapi: 3.0.0
+info:
+  title: User Profile API
+  version: 1.0.0
+  description: API for managing user profiles and updating passwords.
+tags:
+  - name: Profile
+    description: Operations related to user profiles and password management.
+
+paths:
+  /api/user/profile:
+    get:
+      tags:
+        - Profile
+      summary: Retrieve user profile
+      description: Fetches the profile of the authenticated user.
+      security:
+        - bearerAuth: []  # Token must be provided for authentication
+      responses:
+        '200':
+          description: Successfully retrieved user profile.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: "12345"
+                  firstName:
+                    type: string
+                    example: "John"
+                  lastName:
+                    type: string
+                    example: "Doe"
+                  email:
+                    type: string
+                    example: "john.doe@example.com"
+                  phone:
+                    type: string
+                    example: "+1234567890"
+                  dateOfBirth:
+                    type: string
+                    format: date
+                    example: "1990-01-01"
+                  profilePicture:
+                    type: string
+                    example: "http://example.com/profile.jpg"
+        '404':
+          description: User not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "User not found."
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Internal server error."
+
+  /api/user/update-password:
+    put:
+      tags:
+        - Profile
+      summary: Update user password
+      description: Allows an authenticated user to update their password.
+      security:
+        - bearerAuth: []  # Token must be provided for authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                currentPassword:
+                  type: string
+                  example: "OldPassword123"
+                newPassword:
+                  type: string
+                  example: "NewPassword123"
+                confirmPassword:
+                  type: string
+                  example: "NewPassword123"
+      responses:
+        '200':
+          description: Password updated successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Password updated successfully."
+        '400':
+          description: Bad request due to validation errors.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Passwords do not match."
+        '401':
+          description: Unauthorized if the current password is incorrect.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Current password is incorrect."
+        '429':
+          description: Too many requests if password change rate limit is enforced.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Password can only be changed once every 24 hours."
+        '404':
+          description: User not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "User not found."
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Internal server error."
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
