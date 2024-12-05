@@ -3,7 +3,11 @@ import { Product } from "../models/ProductModel";
 
 export default class CartService {
   // Add item to the cart after checking stock
-  static async addItemToCart(userId: number, productId: number, quantity: number) {
+  static async addItemToCart(
+    userId: number,
+    productId: number,
+    quantity: number
+  ) {
     // Find the product by ID
     const product = await Product.findByPk(productId);
 
@@ -32,7 +36,7 @@ export default class CartService {
   static async getUserCart(userId: number) {
     const cartItems = await CartItem.findAll({
       where: { user_id: userId },
-      include: [{ model: Product, as: "productDetails" }],
+      include: [{ model: Product }],
     });
     return cartItems;
   }

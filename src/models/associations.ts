@@ -100,6 +100,15 @@ export const setupAssociations = () => {
     otherKey: "user_id",
   });
 
+  Product.hasMany(CartItem, {
+    foreignKey: "product_id",
+    onDelete: "CASCADE",
+  });
+
+  CartItem.belongsTo(Product, {
+    foreignKey: "product_id",
+  });
+  
   //success message
   console.log(colors.green("Models associations created successfully."));
 };
