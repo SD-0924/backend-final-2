@@ -34,8 +34,8 @@ export class productService {
       productInfo.price_after_discount.toFixed(CONSTANTS.DISCOUNT_PRECISION)
     );
   }
-  // Method to retrieve new arrival products
-  static async getNewArrivalsProducts() {
+  // Method to retrieve new arrival products with optional limit
+  static async getNewArrivalsProducts(limit?: number) {
     const currentDate = new Date();
 
     // Calculate the start date of the previous three months
@@ -44,7 +44,7 @@ export class productService {
 
     try {
       // Fetch products created within the last three months
-      const newProducts: any[] = await Product.findAll({
+      const queryOptions: any = {
         where: {
           createdAt: {
             [Op.between]: [threeMonthsAgo, currentDate],
@@ -59,7 +59,15 @@ export class productService {
           "discount_percentage",
           "product_image_url",
         ],
-      });
+      };
+
+      // Add limit if provided
+      if (limit !== undefined) {
+        queryOptions.limit = limit;
+      }
+
+      // Fetch products
+      const newProducts: any[] = await Product.findAll(queryOptions);
 
       // Process products and clean up fields
       newProducts.forEach((product) => {
@@ -72,6 +80,7 @@ export class productService {
       throw new Error("Failed to fetch new arrival products.");
     }
   }
+
   // This method to get all products that matched user search
   static async findProductsByText(text: string) {
     const products: any = await Product.findAll({
@@ -181,7 +190,7 @@ export class productService {
       throw new Error("Product not found");
     }
     console.log(product.dataValues.stock, "quantity: " + quantity);
-    if (0 >= quantity) return true;
+    if (product.dataValues.stock >= quantity) return true;
 
     return false;
   }
