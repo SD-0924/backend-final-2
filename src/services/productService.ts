@@ -98,14 +98,6 @@ export class productService {
         "product_image_url",
         "averageRating",
         "NumberOfRatings",
-        "product_id",
-        "name",
-        "price",
-        "brand_name",
-        "discount_percentage",
-        "product_image_url",
-        "averageRating",
-        "NumberOfRatings",
       ],
       raw: true,
     });
@@ -119,16 +111,6 @@ export class productService {
     const product: any = await Product.findByPk(product_id, {
       raw: true,
       attributes: [
-        "product_id",
-        "name",
-        "description",
-        "price",
-        "stock",
-        "brand_name",
-        "discount_percentage",
-        "product_image_url",
-        "averageRating",
-        "NumberOfRatings",
         "product_id",
         "name",
         "description",
@@ -154,9 +136,7 @@ export class productService {
   ) {
     const categoryInfo: any =
       await categoryService.getCategoryByName(categoryName);
-    await categoryService.getCategoryByName(categoryName);
     if (!categoryInfo) {
-      return {};
       return {};
     }
     const products: any =
