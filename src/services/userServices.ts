@@ -19,7 +19,10 @@ export default class UserService {
 
       return user;
     } catch (error) {
-      console.error("UserService: Error querying user by email:", (error as Error).message);
+      console.error(
+        "UserService: Error querying user by email:",
+        (error as Error).message
+      );
       throw error;
     }
   }
@@ -29,14 +32,12 @@ export default class UserService {
     return result;
   }
 
-
-
   static async getUserById(id: number) {
     const user = await User.findOne({
       where: {
-        user_id:id,
+        user_id: id,
       },
-       attributes: [
+      attributes: [
         "user_id",
         "firstName",
         "lastName",
@@ -53,26 +54,23 @@ export default class UserService {
     return user;
   }
 
-  static async updateUserPassword(userId: number, newPassword: string){
+  static async updateUserPassword(userId: number, newPassword: string) {
     const user = await User.findOne({
-      where: { 
-        user_id: userId
-      }
+      where: {
+        user_id: userId,
+      },
     });
 
-    if(!user){
+    if (!user) {
       throw new Error(`User with ID ${userId} not found.`);
     }
-    
-    user.password = newPassword;//assign the hashwd password directly
+
+    user.password = newPassword; //assign the hashwd password directly
 
     console.log("Updating lastPasswordChange to:", new Date());
     user.lastPasswordChange = new Date();
     await user.save(); //save the changes
     console.log("Updated user after password change:", user);
-   console.log("Updated lastPasswordChange:", user.lastPasswordChange); // Log for verification
-
+    console.log("Updated lastPasswordChange:", user.lastPasswordChange); // Log for verification
   }
-
 }
-
