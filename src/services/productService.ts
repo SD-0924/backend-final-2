@@ -1,8 +1,11 @@
 // Import the constants
-import { CONSTANTS } from "../constants";
+import { CONSTANTS, FIELD_NAMES, RATING } from "../constants";
 
 // Import product model
 import { Product } from "../models/ProductModel";
+
+// Import rating service
+import { ratingService } from "../services/ratingService";
 
 // Import category service
 import { categoryService } from "../services/categoryService";
@@ -11,7 +14,10 @@ import { categoryService } from "../services/categoryService";
 import { productCategoryService } from "../services/productCategoryService";
 
 // Import Sequelize and Op from sequelize module
-import { Op } from "sequelize";
+import { Op, Sequelize } from "sequelize";
+import { response } from "express";
+import { OrderItem } from "../models/OrderItem";
+import { CartItem } from "../models/CartItemModel";
 
 export class productService {
   // This method to add discount information to product information
@@ -23,57 +29,49 @@ export class productService {
     const discountValue =
       productInfo.price * (productInfo.discount_percentage / 100);
     productInfo.price_after_discount = productInfo.price - discountValue;
+
     productInfo.price_after_discount = parseFloat(
       productInfo.price_after_discount.toFixed(CONSTANTS.DISCOUNT_PRECISION)
     );
   }
- // Method to retrieve new arrival products with optional limit
-static async getNewArrivalsProducts(limit?: number) {
-  const currentDate = new Date();
-  
-  // Calculate the start date of the previous three months
-  const threeMonthsAgo = new Date();
-  threeMonthsAgo.setMonth(currentDate.getMonth() - 3);
-  
-  try {
-    // Fetch products created within the last three months
-    const queryOptions: any = {
-      where: {
-        createdAt: {
-          [Op.between]: [threeMonthsAgo, currentDate],
-        },
-      },
-      raw: true,
-      attributes: [
-        "product_id",
-        "name", 
-        "price",
-        "brand_name",
-        "discount_percentage",
-        "product_image_url",
-      ],
-    };
-    
-    // Add limit if provided
-    if (limit !== undefined) {
-      queryOptions.limit = limit;
-    }
-    
-    // Fetch products
-    const newProducts: any[] = await Product.findAll(queryOptions);
-    
-    // Process products and clean up fields
-    newProducts.forEach((product) => {
-      this.addDiscountInfo(product); // Add discount info
-    });
-    
-    return newProducts;
-  } catch (error) {
-    console.error("Error fetching new arrivals:", error);
-    throw new Error("Failed to fetch new arrival products.");
-  }
-}
+  // Method to retrieve new arrival products
+  static async getNewArrivalsProducts() {
+    const currentDate = new Date();
 
+    // Calculate the start date of the previous three months
+    const threeMonthsAgo = new Date();
+    threeMonthsAgo.setMonth(currentDate.getMonth() - 3);
+
+    try {
+      // Fetch products created within the last three months
+      const newProducts: any[] = await Product.findAll({
+        where: {
+          createdAt: {
+            [Op.between]: [threeMonthsAgo, currentDate],
+          },
+        },
+        raw: true,
+        attributes: [
+          "product_id",
+          "name",
+          "price",
+          "brand_name",
+          "discount_percentage",
+          "product_image_url",
+        ],
+      });
+
+      // Process products and clean up fields
+      newProducts.forEach((product) => {
+        this.addDiscountInfo(product); // Add discount info
+      });
+
+      return newProducts;
+    } catch (error) {
+      console.error("Error fetching new arrivals:", error);
+      throw new Error("Failed to fetch new arrival products.");
+    }
+  }
   // This method to get all products that matched user search
   static async findProductsByText(text: string) {
     const products: any = await Product.findAll({
@@ -162,7 +160,6 @@ static async getNewArrivalsProducts(limit?: number) {
       );
     return products;
   }
-
   // This method to get all brands
   static async getBrandsService() {
     const brands = await Product.findAll({
@@ -171,6 +168,79 @@ static async getNewArrivalsProducts(limit?: number) {
     });
     console.log(brands);
     return brands.map((e) => e.dataValues);
+  }
+
+  //check stock availabilty
+  static async checkStock(product_id: number, quantity: number) {
+    const product = await Product.findOne({
+      where: { product_id },
+    });
+
+    //check if product exist
+    if (!product) {
+      throw new Error("Product not found");
+    }
+    console.log(product.dataValues.stock, "quantity: " + quantity);
+    if (0 >= quantity) return true;
+
+    return false;
+  }
+  //update the stock
+  static async updateStock(
+    product_id: number,
+    quantity: number,
+    operation: string
+  ) {
+    try {
+      const product = await Product.findOne({
+        where: { product_id },
+      });
+
+      //check if product exist
+      if (!product) {
+        throw new Error("Product not found");
+      }
+      if (operation === "sub") {
+        product.dataValues.stock -= quantity;
+      } else {
+        product.dataValues.stock += quantity;
+      }
+    } catch (error) {
+      return { status: 500, response: error };
+    }
+  }
+
+  static async getCartProducts(user_id: number) {
+    const cartItems = await Product.findAll({
+      include: [
+        {
+          model: CartItem,
+          where: { user_id },
+          attributes: ["quantity"],
+        },
+      ],
+    });
+    return cartItems;
+  }
+  static async getOrderProducts(order_id: number) {
+    try {
+      const products = await Product.findAll({
+        include: [
+          {
+            model: OrderItem,
+            where: { order_id },
+            attributes: [
+              "quantity",
+              [Sequelize.literal("quantity*price"), "subtotal"],
+            ],
+          },
+        ],
+        attributes: ["price", "name", "brand_name"],
+      });
+      return products;
+    } catch (error) {
+      return { status: 500, response: error };
+    }
   }
 }
 
