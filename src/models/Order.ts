@@ -26,10 +26,6 @@ export const Order = sequelize.define(
       type: DataTypes.FLOAT,
       allowNull: false,
     },
-    total: {
-      type: DataTypes.FLOAT,
-      allowNull: false,
-    },
   },
   {
     tableName: "order",
