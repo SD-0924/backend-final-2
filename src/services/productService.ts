@@ -190,7 +190,7 @@ export class productService {
       throw new Error("Product not found");
     }
     console.log(product.dataValues.stock, "quantity: " + quantity);
-    if (0 >= quantity) return true;
+    if (product.dataValues.stock >= quantity) return true;
 
     return false;
   }

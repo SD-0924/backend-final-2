@@ -1,111 +1,137 @@
-import { checkoutHandler } from "../src/controllers/checkoutController";
-import { sequelize } from "../src/config/db";
-import { Product } from "../src/models/ProductModel";
-import { CartItem } from "../src/models/CartItemModel";
-import { productService } from "../src/services/productService";
-import { orderService } from "../src/services/orderService";
-import { OrderItem } from "../src/models/OrderItem";
-import { Request, Response } from "express";
+import {
+  orderHistory,
+  orderDetails,
+} from "../src/controllers/checkoutController"; // Adjust the path
+import { Request, Response, NextFunction } from "express";
+import { orderService } from "../src/services/orderService"; // Adjust the path
+import { productService } from "../src/services/productService"; // Adjust the path
 
-jest.mock("../src/config/db");
-jest.mock("../src/models/ProductModel");
-jest.mock("../src/models/CartItemModel");
-jest.mock("../src/models/OrderItem");
-jest.mock("../src/services/productService");
-jest.mock("../src/services/orderService");
+jest.mock("../src/services/orderService", () => ({
+  orderService: {
+    createOrder: jest.fn(),
+    getAllOrders: jest.fn(),
+  },
+})); // Mock orderService
+jest.mock("../src/services/productService", () => ({
+  productService: {
+    getCartProducts: jest.fn(),
+    getOrderProducts: jest.fn(),
+    addDiscountInfo: jest.fn(),
+  },
+})); // Mock productService
 
-describe("checkoutHandler", () => {
-  const mockRequest = (body: any): Request => ({ body }) as Request;
-  const mockResponse = (): Response => {
-    const res = {} as Response;
-    res.status = jest.fn().mockReturnValue(res);
-    res.json = jest.fn().mockReturnValue(res);
-    return res;
-  };
-
-  const mockTransaction = jest.fn();
-  (sequelize.transaction as jest.Mock).mockImplementation(mockTransaction);
+describe("Order Controller", () => {
+  let mockReq: Partial<Request>;
+  let mockRes: Partial<Response>;
+  let mockNext: NextFunction;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    mockReq = {};
+    mockRes = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    };
+    mockNext = jest.fn();
   });
 
-  it("should complete the checkout process successfully", async () => {
-    const req = mockRequest({ user_id: 1 });
-    const res = mockResponse();
+  describe("orderHistory", () => {
+    it("should return a list of orders", async () => {
+      // Arrange
+      const mockOrders = [{ id: 1, item: "Sample Order" }];
+      (orderService.getAllOrders as jest.Mock).mockResolvedValue(mockOrders);
 
-    const mockProductList = [
-      { dataValues: { product_id: 1, price: 100, quantity: 2 } },
-      { dataValues: { product_id: 2, price: 50, quantity: 1 } },
-    ];
-    (Product.findAll as jest.Mock).mockResolvedValue(mockProductList);
-    (productService.checkStock as jest.Mock).mockResolvedValue(true);
-    const simulatePayment = jest.fn().mockReturnValue(true);
-    (orderService.createOrder as jest.Mock).mockResolvedValue({ id: 1 });
-    (OrderItem.bulkCreate as jest.Mock).mockResolvedValue(undefined);
-    (productService.updateStock as jest.Mock).mockResolvedValue(undefined);
+      mockReq.body = { user_id: 1 };
 
-    await checkoutHandler(req, res, jest.fn());
+      // Act
+      await orderHistory(mockReq as Request, mockRes as Response, mockNext);
 
-    expect(Product.findAll).toHaveBeenCalledWith({
-      include: [
-        {
-          model: CartItem,
-          where: { user_id: 1 },
-          attributes: ["quantity"],
-        },
-      ],
+      // Assert
+      expect(orderService.getAllOrders).toHaveBeenCalledWith(1);
+      expect(mockRes.status).toHaveBeenCalledWith(200);
+      expect(mockRes.json).toHaveBeenCalledWith(mockOrders);
     });
 
-    expect(productService.checkStock).toHaveBeenCalledTimes(2);
-    expect(orderService.createOrder).toHaveBeenCalledWith(1, 250, 1);
-    expect(OrderItem.bulkCreate).toHaveBeenCalledWith([
-      { quantity: 2, user_id: 1, product_id: 1 },
-      { quantity: 1, user_id: 1, product_id: 2 },
-    ]);
-    expect(productService.updateStock).toHaveBeenCalledTimes(2);
-    expect(res.status).toHaveBeenCalledWith(202);
-    expect(res.json).toHaveBeenCalledWith({
-      order: mockProductList,
-      total: 250,
-    });
-  });
+    it("should handle errors", async () => {
+      // Arrange
+      const errorMessage = "Something went wrong";
+      (orderService.getAllOrders as jest.Mock).mockRejectedValue(
+        new Error(errorMessage)
+      );
 
-  it("should handle insufficient stock error", async () => {
-    const req = mockRequest({ user_id: 1 });
-    const res = mockResponse();
+      mockReq.body = { user_id: 1 };
 
-    const mockProductList = [
-      { dataValues: { product_id: 1, price: 100, quantity: 2 } },
-    ];
-    (Product.findAll as jest.Mock).mockResolvedValue(mockProductList);
-    (productService.checkStock as jest.Mock).mockResolvedValue(false);
+      // Act
+      await orderHistory(mockReq as Request, mockRes as Response, mockNext);
 
-    await checkoutHandler(req, res, jest.fn());
-
-    expect(res.status).toHaveBeenCalledWith(500);
-    expect(res.json).toHaveBeenCalledWith({
-      message: "Insufficient stock for product ID 1",
+      // Assert
+      expect(orderService.getAllOrders).toHaveBeenCalledWith(1);
+      expect(mockRes.status).toHaveBeenCalledWith(500);
+      expect(mockRes.json).toHaveBeenCalledWith({
+        status: "error",
+        message: errorMessage,
+        details: expect.any(Error),
+      });
     });
   });
 
-  it("should handle payment failure", async () => {
-    const req = mockRequest({ user_id: 1 });
-    const res = mockResponse();
+  describe("orderDetails", () => {
+    it("should return order details", async () => {
+      // Arrange
+      const mockOrderItems = [{ product: "Sample Product", quantity: 2 }];
+      (productService.getOrderProducts as jest.Mock).mockResolvedValue(
+        mockOrderItems
+      );
 
-    const mockProductList = [
-      { dataValues: { product_id: 1, price: 100, quantity: 2 } },
-    ];
-    (Product.findAll as jest.Mock).mockResolvedValue(mockProductList);
-    (productService.checkStock as jest.Mock).mockResolvedValue(true);
-    const simulatePayment = jest.fn().mockReturnValue(false);
-    (orderService.createOrder as jest.Mock).mockResolvedValue({ id: 1 });
+      mockReq.params = { order_id: "1" };
+      mockReq.body = { user_id: 1 };
 
-    await checkoutHandler(req, res, jest.fn());
+      // Act
+      await orderDetails(mockReq as Request, mockRes as Response, mockNext);
 
-    expect(res.status).toHaveBeenCalledWith(500);
-    expect(res.json).toHaveBeenCalledWith({
-      message: "Patment Faild",
+      // Assert
+      expect(productService.getOrderProducts).toHaveBeenCalledWith(1);
+      expect(mockRes.status).toHaveBeenCalledWith(200);
+      expect(mockRes.json).toHaveBeenCalledWith(mockOrderItems);
+    });
+
+    it("should handle missing order_id", async () => {
+      // Arrange
+      mockReq.params = {};
+      mockReq.body = { user_id: 1 };
+
+      // Act
+      await orderDetails(mockReq as Request, mockRes as Response, mockNext);
+
+      // Assert
+      expect(mockRes.status).toHaveBeenCalledWith(500);
+      expect(mockRes.json).toHaveBeenCalledWith({
+        status: "error",
+        message: "no order id provided",
+        details: expect.any(Error),
+      });
+    });
+
+    it("should handle errors", async () => {
+      // Arrange
+      const errorMessage = "Something went wrong";
+      (productService.getOrderProducts as jest.Mock).mockRejectedValue(
+        new Error(errorMessage)
+      );
+
+      mockReq.params = { order_id: "1" };
+      mockReq.body = { user_id: 1 };
+
+      // Act
+      await orderDetails(mockReq as Request, mockRes as Response, mockNext);
+
+      // Assert
+      expect(productService.getOrderProducts).toHaveBeenCalledWith(1);
+      expect(mockRes.status).toHaveBeenCalledWith(500);
+      expect(mockRes.json).toHaveBeenCalledWith({
+        status: "error",
+        message: errorMessage,
+        details: expect.any(Error),
+      });
     });
   });
 });

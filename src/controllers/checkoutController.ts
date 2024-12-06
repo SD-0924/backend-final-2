@@ -36,9 +36,10 @@ export const checkoutHandler = async (
         }
         //3- calculate total
         const total = productList.reduce((sum, product) => {
+          productService.addDiscountInfo(product.dataValues);
           return (
             sum +
-            product.dataValues.price *
+            product.dataValues.price_after_discount *
               product.dataValues.CartItems[0].dataValues.quantity
           );
         }, 0);
