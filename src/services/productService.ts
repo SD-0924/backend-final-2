@@ -17,6 +17,7 @@ import { productCategoryService } from "../services/productCategoryService";
 import { Op, Sequelize } from "sequelize";
 import { response } from "express";
 import { OrderItem } from "../models/OrderItem";
+import { CartItem } from "../models/CartItemModel";
 
 export class productService {
   // This method to add discount information to product information
@@ -229,6 +230,18 @@ export class productService {
     }
   }
 
+  static async getCartProducts(user_id: number) {
+    const cartItems = await Product.findAll({
+      include: [
+        {
+          model: CartItem,
+          where: { user_id },
+          attributes: ["quantity"],
+        },
+      ],
+    });
+    return cartItems;
+  }
   static async getOrderProducts(order_id: number) {
     try {
       const products = await Product.findAll({

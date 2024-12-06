@@ -18,16 +18,9 @@ export const checkoutHandler = async (
       try {
         const { user_id } = req.body;
         //1- fetch cart data
-        const productList = await Product.findAll({
-          include: [
-            {
-              model: CartItem,
-              where: { user_id },
-              attributes: ["quantity"],
-            },
-          ],
-        });
+        const productList = await productService.getCartProducts(user_id);
         console.log(productList[0].dataValues.CartItems);
+
         //2- check stock
         for (const product of productList) {
           const isAvaiable = await productService.checkStock(
@@ -68,7 +61,7 @@ export const checkoutHandler = async (
           order_id: order.dataValues.order_id,
         }));
 
-        await OrderItem.bulkCreate(orderItems);
+        await orderItemService.bulkCreateItems(orderItems);
 
         //update the stock
         for (const product of productList) {
