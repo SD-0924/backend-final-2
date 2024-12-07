@@ -12,8 +12,8 @@ export interface UserAttributes {
   firstName: string;
   lastName: string;
   email: string;
-  phone?: string | null;
-  dateOfBirth?: Date | null;
+  phone: string ;
+  dateOfBirth: Date ;
   password: string;
   address?: string | null;
   profilePicture?: string | null;
@@ -23,11 +23,7 @@ export interface UserAttributes {
 }
 
 // Define the optional fields for creating a new user
-export interface UserCreationAttributes
-  extends Optional<
-    UserAttributes,
-    "user_id" | "lastPasswordChange" | "createdAt" | "updatedAt"
-  > {}
+export interface UserCreationAttributes extends Optional<UserAttributes, "user_id" |"lastPasswordChange" | "createdAt" | "updatedAt"> {}
 
 // Extend Sequelize's Model class
 export class User
@@ -38,8 +34,8 @@ export class User
   public firstName!: string;
   public lastName!: string;
   public email!: string;
-  public phone!: string | null;
-  public dateOfBirth!: Date | null;
+  public phone!: string;
+  public dateOfBirth!: Date;
   public password!: string;
   public address!: string | null;
   public profilePicture!: string | null;
@@ -76,11 +72,11 @@ User.init(
     },
     phone: {
       type: DataTypes.STRING,
-      allowNull: true,
+      allowNull: false,
     },
     dateOfBirth: {
       type: DataTypes.DATEONLY,
-      allowNull: true,
+      allowNull: false,
     },
     password: {
       type: DataTypes.STRING,

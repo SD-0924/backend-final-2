@@ -1,4 +1,5 @@
 import { User, UserCreationAttributes } from "../models/UserModel";
+import { sendPasswordChangeEmail } from "../utils/emailService";
 
 export default class UserService {
   static async findUserByEmail(email: string) {
@@ -45,7 +46,7 @@ export default class UserService {
         "phone",
         "dateOfBirth",
         "password",
-        // "address",
+        "address",
         "profilePicture",
         "lastPasswordChange",
       ],
@@ -72,5 +73,30 @@ export default class UserService {
     await user.save(); //save the changes
     console.log("Updated user after password change:", user);
     console.log("Updated lastPasswordChange:", user.lastPasswordChange); // Log for verification
+
+    await sendPasswordChangeEmail(user.email, `${user.firstName} ${user.lastName}`);
+  }
+  static async updateUserAddress(userId: number, address: string) {
+  try {
+    const user = await User.findOne({
+      where: { user_id: userId },
+    });
+
+    if (!user) {
+      throw new Error(`User with ID ${userId} not found.`);
+    }
+
+    // Update the user's address
+    user.address = address;
+    await user.save(); // Save the updated information in the database
+    console.log("User address updated:", user);
+    return user;
+  } catch (error) {
+    console.error("Error updating user address:", error);
+    throw error;
+  }
   }
 }
+
+
+
