@@ -13,7 +13,7 @@ import profileRoutes from "./routes/profileRoutes"
 
 import { imageRouter } from "./routes/uploadImageRoutes";
 import wishlistRoutes from "./routes/wishlistRoutes";
-
+import checkoutRoutes from "./routes/checkoutRoutes";
 
 
 dotenv.config();
@@ -30,8 +30,9 @@ app.use("/api", productRoutes);
 app.use("/api/", merchantRoutes);
 app.use("/api", imageRouter);
 app.use("/api/wishlist", wishlistRoutes);
-app.use('/api/user', profileRoutes)
-// app.use("/api", authRouter);
+app.use('/api/user', profileRoutes);
+app.use('/api/checkout', checkoutRoutes);
+app.use("/api", authRoutes);
 
 // Middleware to handle invalid routes
 app.use(invalidRoute);
@@ -44,8 +45,8 @@ app.listen(PORT, async () => {
 
   // console.log("Connecting to DB...");
 
-  // await connectToDB();
-  // console.log("Connected to DB successfully.");
+  await connectToDB();
+  console.log("Connected to DB successfully.");
   console.log("Setting up associations...");
   setupAssociations();
   console.log("Associations are set up.");
