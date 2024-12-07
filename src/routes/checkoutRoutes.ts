@@ -1,5 +1,5 @@
 
-// import express from "express";
+import express from "express";
 import { Router } from "express";
 import { getCheckoutInfo,
    updateUserAddress,
@@ -8,12 +8,12 @@ import { getCheckoutInfo,
    orderHistory, } from "../controllers/checkoutController";
 import { verifyToken } from "../utils/verifyToken";
 
-const router = Router();
+const router = express.Router();
 
 // New route for getting checkout info
 router.get("/checkout-info",verifyToken, getCheckoutInfo);
 
-router.put("/update-address",verifyToken, updateUserAddress);
+router.put("/checkout-update-address",verifyToken, updateUserAddress);
 
 // export const checkoutRoutes = express.Router();
 
