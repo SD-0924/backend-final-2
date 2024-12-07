@@ -1,22 +1,23 @@
 // Import rating model
-import { Rating } from '../models/RatingModel'
+import { Rating } from "../models/RatingModel";
 
 // Import Sequelize and Op from sequelize module
-import { Sequelize } from 'sequelize'
-import { RatingObject } from '../controllers/ratingController'
+import { Sequelize } from "sequelize";
+import { RatingObject } from "../controllers/ratingController";
+import { raw } from "body-parser";
 export class ratingService {
   // This function to get number of persons that rating the product and average rating
   static async getProductRating(product_id: number) {
     return await Rating.findAll({
       attributes: [
-        [Sequelize.fn('COUNT', Sequelize.col('rating')), 'number_of_ratings'],
-        [Sequelize.fn('AVG', Sequelize.col('rating')), 'average_rating'],
+        [Sequelize.fn("COUNT", Sequelize.col("rating")), "number_of_ratings"],
+        [Sequelize.fn("AVG", Sequelize.col("rating")), "average_rating"],
       ],
       where: {
         product_id,
       },
       raw: true,
-    })
+    });
   }
 
   static async addRating({
@@ -30,8 +31,8 @@ export class ratingService {
       product_id,
       rating,
       review,
-    })
-    return newRating
+    });
+    return newRating;
   }
 
   static async updateRating({
@@ -46,7 +47,19 @@ export class ratingService {
         review,
       },
       { where: { user_id, product_id } }
-    )
-    return affectedRowsCount
+    );
+    return affectedRowsCount;
+  }
+
+  static async retrieveProductRatingsAndReviews(
+    product_id: number
+  ): Promise<any> {
+    return await Rating.findAll({
+      where: {
+        product_id,
+      },
+      raw: true,
+      attributes: ["rating", "review"],
+    });
   }
 }

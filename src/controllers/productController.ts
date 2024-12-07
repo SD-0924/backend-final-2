@@ -81,6 +81,15 @@ export const createProductController = async (req: Request, res: Response) => {
 };
 
 // Retrieve all new arrivals products
+export const getAllNewArrivalsProducts = async (
+  req: Request,
+  res: Response
+): Promise<any> => {
+  const products = await productService.getNewArrivalsProducts();
+  res.status(200).json(products);
+};
+
+// Retrieve only 4 new arrivals products
 export const getNewArrivalsProducts = async (
   req: Request,
   res: Response
@@ -109,10 +118,13 @@ export const findProductById = async (
   if (err) {
     return res
       .status(400)
-      .json({ message: "product id must be a positive integer" });
+      .json({ message: "Product id must be a positive integer" });
   }
   const productID = Number(req.params.id);
   const product = await productService.findProductById(productID);
+  if (product === null) {
+    return res.status(404).json({ message: "Product not found" });
+  }
   res.status(200).json(product);
 };
 
@@ -123,14 +135,14 @@ export const findProductsByCategory = async (
 ): Promise<any> => {
   if (req.query.page === undefined) {
     return res.status(400).json({
-      message: "you should provide a page number in URL as query params",
+      message: "You should provide a page number in URL as query params",
     });
   }
   // Validate page number using Joi
   const { error: err } = productIdSchema.validate(req.query.page);
   if (err) {
     return res.status(400).json({
-      message: "page number should be positive integer number",
+      message: "Page number should be positive integer number",
     });
   }
   const pageNumber = Number(req.query.page);
@@ -138,6 +150,27 @@ export const findProductsByCategory = async (
   const products = await productService.findProductsByCategory(
     categoryName,
     pageNumber
+  );
+  res.status(200).json(products);
+};
+
+// Retrieve related products for specfic product
+export const getRelatedProducts = async (
+  req: Request,
+  res: Response
+): Promise<any> => {
+  // Validate product id using Joi
+  const { error: err } = productIdSchema.validate(req.params.productId);
+  if (err) {
+    return res.status(400).json({
+      message: "product id should be positive integer number",
+    });
+  }
+  const product_id = Number(req.params.productId);
+  const categoryName = req.params.category;
+  const products = await productService.getRelatedProducts(
+    categoryName,
+    product_id
   );
   res.status(200).json(products);
 };

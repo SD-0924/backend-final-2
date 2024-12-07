@@ -1,0 +1,116 @@
+paths:
+  /api/upload:
+    post:
+      tags:
+        - Image Upload
+      summary: Upload an image
+      operationId: uploadImage
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                image:
+                  type: string
+                  format: binary
+                  description: Image file to upload
+              required:
+                - image
+      responses:
+        '200':
+          description: Image uploaded successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Image uploaded successfully"
+                  data:
+                    type: object
+                    properties:
+                      asset_id:
+                        type: string
+                        description: Unique identifier for the asset
+                      public_id:
+                        type: string
+                        description: Public identifier for the uploaded image
+                      version:
+                        type: integer
+                        description: Version of the uploaded image
+                      version_id:
+                        type: string
+                        description: Unique version identifier
+                      signature:
+                        type: string
+                        description: Signature for the uploaded asset
+                      width:
+                        type: integer
+                        description: Width of the image
+                      height:
+                        type: integer
+                        description: Height of the image
+                      format:
+                        type: string
+                        description: File format of the image
+                      resource_type:
+                        type: string
+                        description: Type of resource uploaded
+                      created_at:
+                        type: string
+                        format: date-time
+                        description: Timestamp of upload
+                      tags:
+                        type: array
+                        items:
+                          type: string
+                        description: Tags associated with the image
+                      bytes:
+                        type: integer
+                        description: Size of the file in bytes
+                      type:
+                        type: string
+                        description: Upload type
+                      etag:
+                        type: string
+                        description: ETag of the uploaded file
+                      placeholder:
+                        type: boolean
+                        description: Indicates if it's a placeholder
+                      url:
+                        type: string
+                        description: HTTP URL of the uploaded image
+                      secure_url:
+                        type: string
+                        description: HTTPS URL of the uploaded image
+                      asset_folder:
+                        type: string
+                        description: Folder of the asset
+                      display_name:
+                        type: string
+                        description: Display name of the uploaded file
+                      original_filename:
+                        type: string
+                        description: Original filename of the uploaded image
+                      api_key:
+                        type: string
+                        description: API key used for upload
+        '500':
+          description: Error uploading image
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "An error occurred while uploading the image."

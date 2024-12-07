@@ -33,7 +33,7 @@ export const createMerchant = async (req: Request, res: Response): Promise<Respo
         if (error) {
             return res.status(400).json({
                 status: 'error',
-                message: error.details[0].message
+                message: "Validation error message"
             });
         }
 

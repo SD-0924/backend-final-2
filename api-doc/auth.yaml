@@ -1,0 +1,177 @@
+paths:
+  /api/auth/signup:
+    post:
+      tags:
+        - Authentication
+      summary: User Signup
+      operationId: signup
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                role:
+                  type: string
+                  enum: 
+                    - user
+                    - merchant
+                  description: Role of the person signing up
+                  example: "user"
+                email:
+                  type: string
+                  format: email
+                  description: Email address of the user/merchant
+                  example: "exampleuser@example.com"
+                password:
+                  type: string
+                  description: Password for the account
+                  example: "securePassword123"
+                firstName:
+                  type: string
+                  description: First name of the user/merchant
+                  example: "John"
+                lastName:
+                  type: string
+                  description: Last name of the user/merchant
+                  example: "Doe"
+                phone:
+                  type: string
+                  description: Phone number of the user/merchant
+                  example: "1234567890"
+                address:
+                  type: string
+                  description: Address of the user/merchant
+                  example: "123 Main Street, Main Land"
+                dateOfBirth:
+                  type: string
+                  format: date
+                  description: Date of birth of the user/merchant
+                  example: "1995-01-15"
+              required:
+                - role
+                - email
+                - password
+                - firstName
+                - lastName
+                - phone
+                - address
+                - dateOfBirth
+      responses:
+        '201':
+          description: Successful signup
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  token:
+                    type: string
+                    description: JWT token for authentication
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MjEsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzMzMzA4OTMzfQ.o1IZ3Ib31kFdO2CsaZM7Cy32wt2Xgsub0UtVtyVgeZE"
+        '400':
+          description: Bad request - Validation error or user already exists
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - type: string
+                    description: Validation error message
+                  - type: object
+                    properties:
+                      success:
+                        type: boolean
+                        example: false
+                      message:
+                        type: string
+                        example: "User already exists, please login."
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Internal server error"
+  paths:
+  /api/auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: User Login
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  description: Email address of the user
+                  example: "exampleuser@example.com"
+                password:
+                  type: string
+                  description: Password for the account
+                  example: "securePassword123"
+                role:
+                  type: string
+                  enum: 
+                    - user
+                    - merchant
+                  description: Role of the user logging in
+                  example: "user"
+              required:
+                - email
+                - password
+                - role
+      responses:
+        '200':
+          description: Successful login
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    description: JWT token for authentication
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MjEsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzMzMzA5MjcxfQ.5QjbgTGhdriy0MoGSzK1wbqBcqorKdnwjSA2a0KE08c"
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                type: string
+                example: "'password' must be a string"
+        '404':
+          description: User not found or incorrect credentials
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "your email or password"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Internal server error"

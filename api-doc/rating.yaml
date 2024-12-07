@@ -1,0 +1,235 @@
+openapi: 3.0.0
+info:
+  title: Ratings and Reviews API
+  description: API for managing ratings and reviews of products.
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000/api/rating
+paths:
+  /api/rating/:
+    post:
+      summary: Add a new rating and review for a product.
+      tags:
+        - Ratings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  type: integer
+                  example: 1
+                product_id:
+                  type: integer
+                  example: 70
+                rating:
+                  type: number
+                  minimum: 1
+                  maximum: 5
+                  example: 4
+                review:
+                  type: string
+                  minLength: 5
+                  maxLength: 500
+                  example: "Great product!"
+              required:
+                - user_id
+                - product_id
+                - rating
+                - review
+      responses:
+        201:
+          description: Rating and review added successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user_id:
+                    type: integer
+                    example: 1
+                  product_id:
+                    type: integer
+                    example: 70
+                  rating:
+                    type: number
+                    example: 4
+                  review:
+                    type: string
+                    example: "Great product!"
+        400:
+          description: Invalid input.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Validation error: Invalid input format."
+        500:
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Unexpected server error."
+
+    put:
+      summary: Update an existing rating and review for a product.
+      tags:
+        - Ratings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  type: integer
+                  example: 1
+                product_id:
+                  type: integer
+                  example: 10
+                rating:
+                  type: number
+                  minimum: 1
+                  maximum: 5
+                  example: 5
+                review:
+                  type: string
+                  minLength: 5
+                  maxLength: 500
+                  example: "Amazing product!"
+              required:
+                - user_id
+                - product_id
+                - rating
+                - review
+      responses:
+        201:
+          description: Rating and review updated successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user_id:
+                    type: integer
+                    example: 1
+                  product_id:
+                    type: integer
+                    example: 10
+                  rating:
+                    type: number
+                    example: 5
+                  review:
+                    type: string
+                    example: "Amazing product!"
+        400:
+          description: Invalid input or missing updated values.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Invalid input: Missing or incorrect fields."
+        500:
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Unexpected server error."
+
+  /api/rating/productRating/{productId}:
+    get:
+      summary: Retrieve all ratings and reviews for a specific product.
+      tags:
+        - Ratings
+      parameters:
+        - in: path
+          name: productId
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          description: The ID of the product.
+      responses:
+        200:
+          description: Ratings and reviews retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    rating:
+                      type: number
+                      example: 4
+                    review:
+                      type: string
+                      example: "Great product!"
+        400:
+          description: Invalid product ID.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Product ID must be a positive integer."
+        404:
+          description: Product not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "No ratings or reviews found for the given product ID."
+        500:
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Unexpected server error."

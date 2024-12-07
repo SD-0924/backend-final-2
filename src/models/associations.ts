@@ -8,6 +8,8 @@ import { Merchant } from "./MerchantModel";
 import { ProductCategory } from "./ProductCategoryModel";
 
 import colors from "colors";
+import { Order } from "./Order";
+import { OrderItem } from "./OrderItem";
 
 /**
  * Sets up associations between models
@@ -98,6 +100,60 @@ export const setupAssociations = () => {
     through: WishlistItem,
     foreignKey: "product_id",
     otherKey: "user_id",
+  });
+
+  /**
+   * One-to-many relationship between User and Order.
+   * Each User can have many orders but an order can belong just to one user
+   */
+  User.hasMany(Order, {
+    foreignKey: "user_id",
+  });
+  Order.belongsTo(User, {
+    foreignKey: "user_id",
+  });
+
+  /**
+   * One-to-many relationship between Order and OrderItem.
+   * Each order can have many orderItem but orderItem belongs just to one order
+   */
+
+  Order.hasMany(OrderItem, {
+    foreignKey: "order_id",
+  });
+  OrderItem.belongsTo(Order, {
+    foreignKey: "order_id",
+  });
+
+  /**
+   * One-to-many relationship between Product and OrderItem.
+   * Each product can have many orderItem but orderItem belongs just to one order
+   */
+
+  Product.hasMany(OrderItem, {
+    foreignKey: "porduct_id",
+  });
+
+  OrderItem.belongsTo(Product, {
+    foreignKey: "porduct_id",
+  });
+
+  Product.hasMany(CartItem, {
+    foreignKey: "product_id",
+    onDelete: "CASCADE",
+  });
+
+  CartItem.belongsTo(Product, {
+    foreignKey: "product_id",
+  });
+
+  Product.hasMany(CartItem, {
+    foreignKey: "product_id",
+    onDelete: "CASCADE",
+  });
+
+  CartItem.belongsTo(Product, {
+    foreignKey: "product_id",
   });
 
   //success message

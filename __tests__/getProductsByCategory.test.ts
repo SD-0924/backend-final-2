@@ -113,7 +113,7 @@ describe("Get Products By Category Name API", () => {
     expect(response.status).toBe(400);
     expect(response.body).toHaveProperty(
       "message",
-      "you should provide a page number in URL as query params"
+      "You should provide a page number in URL as query params"
     );
   });
 
@@ -126,7 +126,7 @@ describe("Get Products By Category Name API", () => {
     expect(response.status).toBe(400);
     expect(response.body).toHaveProperty(
       "message",
-      "page number should be positive integer number"
+      "Page number should be positive integer number"
     );
   });
 });

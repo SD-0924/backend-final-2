@@ -1,0 +1,689 @@
+openapi: 3.0.0
+info:
+  title: Product API
+  description: API for managing products, categories, and related functionalities.
+  version: 1.0.0
+paths:
+  /api/newArrivals/all:
+    get:
+      tags:
+        - Product
+      summary: Retrieve all new arrivals products
+      description: Fetch all products that were created within the last three months.
+      responses:
+        200:
+          description: Successfully retrieved all new arrivals products
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    product_id:
+                      type: integer
+                      example: 7
+                    name:
+                      type: string
+                      example: "Unbranded Concrete Sausages"
+                    price:
+                      type: number
+                      format: float
+                      example: 4156
+                    brand_name:
+                      type: string
+                      example: "Oakley"
+                    discount_percentage:
+                      type: integer
+                      example: 16
+                    product_image_url:
+                      type: string
+                      format: uri
+                      example: "https://i.ibb.co/d0SW2yG/7.jpg"
+                    price_after_discount:
+                      type: number
+                      format: float
+                      example: 3491.04
+        500:
+          description: Server error while fetching new arrivals products
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Failed to fetch new arrival products."
+  /api/newArrivals:
+    get:
+      tags:
+        - Product
+      summary: Retrieve only 4 new arrivals products
+      description: Fetch only 4 products that were created within the last three months.
+      responses:
+        200:
+          description: Successfully retrieved all new arrivals products
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    product_id:
+                      type: integer
+                      example: 7
+                    name:
+                      type: string
+                      example: "Unbranded Concrete Sausages"
+                    price:
+                      type: number
+                      format: float
+                      example: 4156
+                    brand_name:
+                      type: string
+                      example: "Oakley"
+                    discount_percentage:
+                      type: integer
+                      example: 16
+                    product_image_url:
+                      type: string
+                      format: uri
+                      example: "https://i.ibb.co/d0SW2yG/7.jpg"
+                    price_after_discount:
+                      type: number
+                      format: float
+                      example: 3491.04
+        500:
+          description: Server error while fetching new arrivals products
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Failed to fetch new arrival products."
+  /api/search/{text}:
+    get:
+      tags:
+        - Product
+      summary: Search products by keyword
+      description: Retrieve all products where the product name or brand contains the specified keyword.
+      parameters:
+        - name: text
+          in: path
+          required: true
+          description: The keyword to search for in product names or brands.
+          schema:
+            type: string
+            example: "bag"
+      responses:
+        200:
+          description: Successfully retrieved products matching the search keyword.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    product_id:
+                      type: integer
+                      example: 45
+                    name:
+                      type: string
+                      example: "Black Handbag"
+                    price:
+                      type: number
+                      format: float
+                      example: 79.99
+                    brand_name:
+                      type: string
+                      example: "Remus"
+                    discount_percentage:
+                      type: integer
+                      example: 10
+                    product_image_url:
+                      type: string
+                      format: uri
+                      example: "https://i.ibb.co/j8V92SV/handbag1.jpg"
+                    averageRating:
+                      type: number
+                      format: float
+                      example: 0
+                    NumberOfRatings:
+                      type: integer
+                      example: 0
+                    price_after_discount:
+                      type: number
+                      format: float
+                      example: 71.99
+        404:
+          description: No products found matching the search criteria.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: {}
+                example: []
+        500:
+          description: Server error while processing the search request.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "An error occurred while fetching the products."
+
+  /api/products/{id}:
+    get:
+      tags:
+        - Product
+      summary: Retrieve a specific product by its ID
+      description: Fetch a product based on the provided product ID.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the product to retrieve.
+          schema:
+            type: integer
+            example: 78
+      responses:
+        200:
+          description: Successfully retrieved the product
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  product_id:
+                    type: integer
+                    example: 78
+                  name:
+                    type: string
+                    example: "Hair Brush Set"
+                  description:
+                    type: string
+                    example: "Heat Free Hair Brush Set - complete tools for a perfect hairdo."
+                  price:
+                    type: number
+                    format: float
+                    example: 40
+                  stock:
+                    type: integer
+                    example: 75
+                  brand_name:
+                    type: string
+                    example: "Heat Free Hair"
+                  discount_percentage:
+                    type: integer
+                    example: 7
+                  product_image_url:
+                    type: string
+                    format: uri
+                    example: "https://i.ibb.co/7v6NLs2/personalcare4.webp"
+                  averageRating:
+                    type: number
+                    format: float
+                    example: 0
+                  NumberOfRatings:
+                    type: integer
+                    example: 0
+                  price_after_discount:
+                    type: number
+                    format: float
+                    example: 37.2
+        400:
+          description: Invalid product ID provided
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Product id must be a positive integer"
+        404:
+          description: Product not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Product not found"
+        500:
+          description: Server error while fetching product
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "An error occurred while fetching the product"
+                    
+  /api/products/{category}:
+    get:
+      tags:
+        - Product
+      summary: Retrieve all products related to a specific category
+      description: Fetch all products that belong to the specified category with pagination support.
+      parameters:
+        - name: category
+          in: path
+          required: true
+          description: The name of the category to retrieve products for.
+          schema:
+            type: string
+            example: "Personal Care"
+        - name: page
+          in: query
+          required: true
+          description: The page number for pagination.
+          schema:
+            type: integer
+            example: 2
+      responses:
+        200:
+          description: Successfully retrieved products for the specified category
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  number_of_pages:
+                    type: integer
+                    example: 2
+                  products:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        product_id:
+                          type: integer
+                          example: 68
+                        name:
+                          type: string
+                          example: "NIVEA Moisture Body Lotion"
+                        price:
+                          type: number
+                          format: float
+                          example: 10.99
+                        brand_name:
+                          type: string
+                          example: "NIVEA"
+                        discount_percentage:
+                          type: integer
+                          example: 5
+                        product_image_url:
+                          type: string
+                          format: uri
+                          example: "https://i.ibb.co/jhpr45J/skincare8.webp"
+                        averageRating:
+                          type: number
+                          format: float
+                          example: 0
+                        NumberOfRatings:
+                          type: integer
+                          example: 0
+                        totalCount:
+                          type: integer
+                          example: 18
+                        price_after_discount:
+                          type: number
+                          format: float
+                          example: 10.44
+        400:
+          description: Invalid page number or Did not provide a page number in the query params
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Page number should be positive integer number OR You should provide a page number in URL as query params"
+        404:
+          description: No products found for the given category
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+        500:
+          description: Server error while processing the request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "An error occurred while fetching the products"
+  /api/products/{category}/{productId}:
+    get:
+      tags:
+        - Product
+      summary: Retrieve related products for a specific product
+      description: Get a list of related products based on the specified category and product ID.
+      parameters:
+        - name: category
+          in: path
+          required: true
+          description: The category of the product.
+          schema:
+            type: string
+        - name: productId
+          in: path
+          required: true
+          description: The ID of the product for which related products are needed.
+          schema:
+            type: integer
+      responses:
+        200:
+          description: A list of related products
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    product_id:
+                      type: integer
+                      example: 78
+                    name:
+                      type: string
+                      example: "Hair Brush Set"
+                    price:
+                      type: number
+                      example: 40
+                    brand_name:
+                      type: string
+                      example: "Heat Free Hair"
+                    discount_percentage:
+                      type: number
+                      example: 7
+                    product_image_url:
+                      type: string
+                      example: "https://i.ibb.co/7v6NLs2/personalcare4.webp"
+                    averageRating:
+                      type: number
+                      example: 0
+                    NumberOfRatings:
+                      type: integer
+                      example: 0
+                    price_after_discount:
+                      type: number
+                      example: 37.2
+        400:
+          description: Invalid product ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "product id should be positive integer number"
+  /api/brands:
+    get:
+      tags:
+        - Product
+      summary: Retrieve a list of product brands
+      description: Get a list of all available product brands.
+      responses:
+        200:
+          description: A list of product brands
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    brand_image_url:
+                      type: string
+                      example: "https://i.ibb.co/tDmntdx/advanced-clinicals.png"
+                    brand_name:
+                      type: string
+                      example: "Advanced Clinicals"
+        404:
+          description: No brands found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "No brands found"
+        500:
+          description: Internal Database Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Internal Database Error"
+  /api/product/brand/{brandName}:
+    get:
+      tags:
+        - Product
+      summary: Retrieve products by brand name
+      description: Get a list of products for a specific brand.
+      parameters:
+        - in: path
+          name: brandName
+          required: true
+          schema:
+            type: string
+          description: The name of the brand to filter products by.
+      responses:
+        200:
+          description: A list of products for the specified brand
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    product_id:
+                      type: integer
+                      example: 45
+                    name:
+                      type: string
+                      example: "Black Handbag"
+                    description:
+                      type: string
+                      example: "Stylish and sleek black handbag crafted for modern professionals, featuring a premium finish and ample space for daily essentials."
+                    price:
+                      type: number
+                      format: float
+                      example: 79.99
+                    stock:
+                      type: integer
+                      example: 25
+                    merchant_id:
+                      type: integer
+                      example: 1
+                    brand_name:
+                      type: string
+                      example: "Remus"
+                    discount_percentage:
+                      type: integer
+                      example: 10
+                    product_image_url:
+                      type: string
+                      example: "https://i.ibb.co/j8V92SV/handbag1.jpg"
+                    brand_image_url:
+                      type: string
+                      example: "https://i.ibb.co/648KZC1/rumus.png"
+                    averageRating:
+                      type: number
+                      format: float
+                      example: 0
+                    NumberOfRatings:
+                      type: integer
+                      example: 0
+                    createdAt:
+                      type: string
+                      format: date-time
+                      example: "2024-12-01T10:50:13.000Z"
+                    updatedAt:
+                      type: string
+                      format: date-time
+                      example: "2024-12-01T10:50:13.000Z"
+        400:
+          description: Invalid brand name parameter
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Brand name is required"
+        404:
+          description: No products found for the specified brand
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "No products found"
+        500:
+          description: Internal Database Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Internal Database Error"
+  /api/product/create:
+    post:
+      tags:
+        - Product
+      summary: Create a new product
+      description: Create a new product entry in the system.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "Gaming Mouse"
+                description:
+                  type: string
+                  example: "Ergonomic gaming mouse with customizable RGB lighting and high-precision sensors."
+                price:
+                  type: number
+                  format: float
+                  example: 49.99
+                stock:
+                  type: integer
+                  example: 100
+                brand_name:
+                  type: string
+                  example: "ProGamer"
+                merchant_id:
+                  type: integer
+                  example: 1
+      responses:
+        201:
+          description: Product created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  createdAt:
+                    type: string
+                    format: date-time
+                    example: "2024-12-03T18:43:59.717Z"
+                  updatedAt:
+                    type: string
+                    format: date-time
+                    example: "2024-12-03T18:43:59.719Z"
+                  averageRating:
+                    type: number
+                    format: float
+                    example: 0
+                  NumberOfRatings:
+                    type: integer
+                    example: 0
+                  product_id:
+                    type: integer
+                    example: 79
+                  name:
+                    type: string
+                    example: "Gaming Mouse"
+                  description:
+                    type: string
+                    example: "Ergonomic gaming mouse with customizable RGB lighting and high-precision sensors."
+                  price:
+                    type: number
+                    format: float
+                    example: 49.99
+                  stock:
+                    type: integer
+                    example: 100
+                  brand_name:
+                    type: string
+                    example: "ProGamer"
+                  merchant_id:
+                    type: integer
+                    example: 1
+        400:
+          description: Invalid input data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Product validation failed"
+        500:
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Internal Server Error"
+  
+    
+    
+    
+      
+        
+        
+          

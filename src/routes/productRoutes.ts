@@ -4,7 +4,11 @@ import * as productController from "../controllers/productController";
 export const productRoutes = express.Router();
 
 // Route for get all new arrivals products
+productRoutes.get("/newArrivals/all", productController.getAllNewArrivalsProducts);
+
+// Route for get 4 new arrivals products
 productRoutes.get("/newArrivals", productController.getNewArrivalsProducts);
+
 
 // Route for get all products based on user search
 productRoutes.get("/search/:text", productController.findProductsByText);
@@ -16,6 +20,12 @@ productRoutes.get("/product/:id", productController.findProductById);
 productRoutes.get(
   "/products/:category",
   productController.findProductsByCategory
+);
+
+// Route for get products that are related to a specific product
+productRoutes.get(
+  "/products/:category/:productId",
+  productController.getRelatedProducts
 );
 
 // Route for brands

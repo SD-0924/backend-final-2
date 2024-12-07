@@ -6,33 +6,39 @@ import { setupAssociations } from "./models/associations";
 import { productRoutes } from "./routes/productRoutes";
 import merchantRoutes from "./routes/merchantRoutes";
 import { invalidRoute, invalidJSON } from "./middleware/errorHandler";
-import { signUp } from "./controllers/authController";
-
-import authRoutes from "./routes/authRoutes";
-import profileRoutes from "./routes/profileRoutes"
-
+import profileRoutes from "./routes/profileRoutes";
+import authRouter from "./routes/authRoutes";
+import  checkoutRoutes  from "./routes/checkoutRoutes";
 import { imageRouter } from "./routes/uploadImageRoutes";
 import wishlistRoutes from "./routes/wishlistRoutes";
-import checkoutRoutes from "./routes/checkoutRoutes";
+
+import cartRouter from "./routes/cartRoutes";
+import { ratingRouter } from "./routes/ratingRoutes";
+import swaggerUi from "swagger-ui-express";
+import { swaggerSpec } from "./swaggerConfig";
 
 
 dotenv.config();
 
 // dotenv.configDotenv();
 
-
 export const app = express();
 app.use(express.json());
 const PORT = Number(process.env.PORT) || 3000;
-
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.use("/api", productRoutes);
 app.use("/api/", merchantRoutes);
 app.use("/api", imageRouter);
 app.use("/api/wishlist", wishlistRoutes);
+
 app.use('/api/user', profileRoutes);
-app.use('/api/checkout', checkoutRoutes);
-app.use("/api", authRoutes);
+app.use('/api', checkoutRoutes);
+// app.use("/api", authRoutes);
+
+app.use("/api", authRouter);
+app.use("/api/cart", cartRouter);
+app.use("/api/rating", ratingRouter);
 
 // Middleware to handle invalid routes
 app.use(invalidRoute);
@@ -49,13 +55,13 @@ app.listen(PORT, async () => {
   console.log("Connected to DB successfully.");
   console.log("Setting up associations...");
   setupAssociations();
-  console.log("Associations are set up.");
+  // console.log("Associations are set up.");
   // console.log("Syncing Sequelize...");
-  // await sequelize.sync({alter: true});
+  // await sequelize.sync({ alter: true });
   // console.log("Sequelize has been synced.");
-  // console.log("Syncing Admin model...");
+  //console.log("Syncing Admin model...");
 
-  // await Admin.sync({ force: true });
+  //await Admin.sync({ force: true });
   // console.log("Admin model has been synced.");
 
   // console.log(`Server is running on port ${PORT}`);
