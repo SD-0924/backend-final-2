@@ -229,3 +229,20 @@ export const getHandPicked = async (
     });
   }
 };
+
+//handpicked collection list:
+
+export const getHandpickedCollectionList = async (
+  req: Request,
+  res: Response
+): Promise<any> => {
+  try {
+    const handpickedCollectionList =
+      await productCategoryService.getCategoryList(true);
+    res.status(200).json(handpickedCollectionList);
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};

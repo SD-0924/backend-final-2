@@ -129,4 +129,19 @@ export class productCategoryService {
       products: categoryProducts.rows,
     };
   }
+
+  static async getCategoryList(imagesIncluded: boolean) {
+    if (imagesIncluded) {
+      const categoreis = await Category.findAll({
+        raw: true,
+      });
+      return categoreis;
+    } else {
+      const categoreis = await Category.findAll({
+        raw: true,
+        attributes: ["category_id", "name"],
+      });
+      return categoreis;
+    }
+  }
 }
