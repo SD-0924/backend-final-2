@@ -8,13 +8,15 @@ import merchantRoutes from "./routes/merchantRoutes";
 import { invalidRoute, invalidJSON } from "./middleware/errorHandler";
 import profileRoutes from "./routes/profileRoutes";
 import authRouter from "./routes/authRoutes";
-import { checkoutRoutes } from "./routes/checkoutRoutes";
+import  checkoutRoutes  from "./routes/checkoutRoutes";
 import { imageRouter } from "./routes/uploadImageRoutes";
 import wishlistRoutes from "./routes/wishlistRoutes";
+
 import cartRouter from "./routes/cartRoutes";
 import { ratingRouter } from "./routes/ratingRoutes";
 import swaggerUi from "swagger-ui-express";
 import { swaggerSpec } from "./swaggerConfig";
+
 
 dotenv.config();
 
@@ -29,8 +31,11 @@ app.use("/api", productRoutes);
 app.use("/api/", merchantRoutes);
 app.use("/api", imageRouter);
 app.use("/api/wishlist", wishlistRoutes);
-app.use("/api", checkoutRoutes);
-app.use("/api/user", profileRoutes);
+
+app.use('/api/user', profileRoutes);
+app.use('/api', checkoutRoutes);
+// app.use("/api", authRoutes);
+
 app.use("/api", authRouter);
 app.use("/api/cart", cartRouter);
 app.use("/api/rating", ratingRouter);
@@ -46,9 +51,9 @@ app.listen(PORT, async () => {
 
   // console.log("Connecting to DB...");
 
-  // await connectToDB();
-  // console.log("Connected to DB successfully.");
-  // console.log("Setting up associations...");
+  await connectToDB();
+  console.log("Connected to DB successfully.");
+  console.log("Setting up associations...");
   setupAssociations();
   // console.log("Associations are set up.");
   // console.log("Syncing Sequelize...");

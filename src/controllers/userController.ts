@@ -30,6 +30,7 @@ export const getUserProfile = async (req: Request, res: Response, next: NextFunc
       phone: user.phone,
       dateOfBirth: user.dateOfBirth,
       profilePicture: user.profilePicture,
+      // lastPasswordChange: user.lastPasswordChange,
     });
   } catch (error) {
     if (error instanceof Error) {
