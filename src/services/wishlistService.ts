@@ -24,7 +24,7 @@ export default class WishlistService {
   static async destroyWishlistItem(wishlist: number) {
     const deleted = await WishlistItem.destroy({
       where: {
-        wishlist_Id: wishlist,
+        wishlistItem_Id: wishlist,
       },
     });
     return deleted; // Returns the number of rows deleted
